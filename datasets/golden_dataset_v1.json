@@ -1,0 +1,1122 @@
+[
+{
+"id":"email_001",
+"input":"I was charged twice for my subscription this month.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged twice for a subscription."
+},
+"expected_difficulty":"easy",
+"notes":"Basic duplicate charge detection"
+},
+
+{
+"id":"email_002",
+"input":"I need a refund because I was billed incorrectly.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer requests a refund for an incorrect charge."
+},
+"expected_difficulty":"easy",
+"notes":"Refund request"
+},
+
+{
+"id":"email_003",
+"input":"My credit card payment is not going through.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer cannot complete payment."
+},
+"expected_difficulty":"easy",
+"notes":"Payment failure"
+},
+
+{
+"id":"email_004",
+"input":"Why did my monthly plan price increase?",
+"expected_output":{
+"category":"billing",
+"summary":"Customer asks about subscription price increase."
+},
+"expected_difficulty":"easy",
+"notes":"Pricing question"
+},
+
+{
+"id":"email_005",
+"input":"I don't recognize this charge on my account.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer reports an unknown charge."
+},
+"expected_difficulty":"medium",
+"notes":"Possible fraud-related billing issue"
+},
+
+
+{
+"id":"email_006",
+"input":"The mobile app crashes when I open it.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports that the mobile app crashes."
+},
+"expected_difficulty":"easy",
+"notes":"Application crash"
+},
+
+{
+"id":"email_007",
+"input":"The website is loading very slowly.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports slow website performance."
+},
+"expected_difficulty":"easy",
+"notes":"Performance issue"
+},
+
+{
+"id":"email_008",
+"input":"I cannot upload my files.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer cannot upload files."
+},
+"expected_difficulty":"easy",
+"notes":"Feature malfunction"
+},
+
+{
+"id":"email_009",
+"input":"The app shows an error every time I click submit.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer encounters an application error."
+},
+"expected_difficulty":"easy",
+"notes":"Error message issue"
+},
+
+{
+"id":"email_010",
+"input":"The notification system stopped working.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports notification failure."
+},
+"expected_difficulty":"easy",
+"notes":"Feature failure"
+},
+
+
+{
+"id":"email_011",
+"input":"I forgot my password.",
+"expected_output":{
+"category":"account",
+"summary":"Customer forgot password and needs account access."
+},
+"expected_difficulty":"easy",
+"notes":"Password recovery"
+},
+
+{
+"id":"email_012",
+"input":"I cannot login to my account.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot access their account."
+},
+"expected_difficulty":"easy",
+"notes":"Login problem"
+},
+
+{
+"id":"email_013",
+"input":"Please change the email address connected to my account.",
+"expected_output":{
+"category":"account",
+"summary":"Customer wants to update account email."
+},
+"expected_difficulty":"easy",
+"notes":"Account information update"
+},
+
+{
+"id":"email_014",
+"input":"My account has been locked.",
+"expected_output":{
+"category":"account",
+"summary":"Customer account is locked."
+},
+"expected_difficulty":"easy",
+"notes":"Account security"
+},
+
+{
+"id":"email_015",
+"input":"I want to delete my account.",
+"expected_output":{
+"category":"account",
+"summary":"Customer requests account deletion."
+},
+"expected_difficulty":"easy",
+"notes":"Account removal request"
+},
+
+
+{
+"id":"email_016",
+"input":"What features does your service provide?",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks about available features."
+},
+"expected_difficulty":"easy",
+"notes":"General inquiry"
+},
+
+{
+"id":"email_017",
+"input":"Where can I learn more about your product?",
+"expected_output":{
+"category":"general",
+"summary":"Customer requests product information."
+},
+"expected_difficulty":"easy",
+"notes":"Information request"
+},
+
+{
+"id":"email_018",
+"input":"Do you offer discounts?",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks about discounts."
+},
+"expected_difficulty":"easy",
+"notes":"General pricing question"
+},
+
+{
+"id":"email_019",
+"input":"How can I contact support?",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks how to contact support."
+},
+"expected_difficulty":"easy",
+"notes":"Support information"
+},
+
+{
+"id":"email_020",
+"input":"Thank you, your service is excellent.",
+"expected_output":{
+"category":"general",
+"summary":"Customer provides positive feedback."
+},
+"expected_difficulty":"easy",
+"notes":"Positive message"
+}
+,
+[
+{
+"id":"email_021",
+"input":"",
+"expected_output":{
+"category":"general",
+"summary":"Customer provided an empty message."
+},
+"expected_difficulty":"hard",
+"notes":"Tests empty input handling."
+},
+
+{
+"id":"email_022",
+"input":"Help",
+"expected_output":{
+"category":"general",
+"summary":"Customer requests assistance without details."
+},
+"expected_difficulty":"medium",
+"notes":"Very short unclear request."
+},
+
+{
+"id":"email_023",
+"input":"Not working",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports a problem without additional details."
+},
+"expected_difficulty":"medium",
+"notes":"Requires interpreting a vague technical complaint."
+},
+
+{
+"id":"email_024",
+"input":"I paid but still nothing",
+"expected_output":{
+"category":"billing",
+"summary":"Customer paid but did not receive expected service."
+},
+"expected_difficulty":"hard",
+"notes":"Could be billing or technical; tests payment context."
+},
+
+{
+"id":"email_025",
+"input":"I cannot use anything after updating the app",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports problems after an application update."
+},
+"expected_difficulty":"medium",
+"notes":"Update-related technical issue."
+},
+
+
+{
+"id":"email_026",
+"input":"URGENT!!! FIX THIS NOW!!!",
+"expected_output":{
+"category":"technical",
+"summary":"Customer urgently reports a problem requiring assistance."
+},
+"expected_difficulty":"medium",
+"notes":"Emotional language without details."
+},
+
+{
+"id":"email_027",
+"input":"Your company stole my money",
+"expected_output":{
+"category":"billing",
+"summary":"Customer complains about a suspected incorrect charge."
+},
+"expected_difficulty":"medium",
+"notes":"Angry billing complaint."
+},
+
+{
+"id":"email_028",
+"input":"I want my money back because this is useless",
+"expected_output":{
+"category":"billing",
+"summary":"Customer requests a refund due to dissatisfaction."
+},
+"expected_difficulty":"medium",
+"notes":"Refund request mixed with complaint."
+},
+
+{
+"id":"email_029",
+"input":"Can someone call me?",
+"expected_output":{
+"category":"general",
+"summary":"Customer requests contact from support."
+},
+"expected_difficulty":"easy",
+"notes":"Simple support request."
+},
+
+{
+"id":"email_030",
+"input":"Where is my order?",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks about order status."
+},
+"expected_difficulty":"medium",
+"notes":"Tests unsupported but general customer question."
+},
+
+
+{
+"id":"email_031",
+"input":"I changed my password but it still says incorrect",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot access account after changing password."
+},
+"expected_difficulty":"medium",
+"notes":"Account issue with troubleshooting context."
+},
+
+{
+"id":"email_032",
+"input":"Someone logged into my account",
+"expected_output":{
+"category":"account",
+"summary":"Customer reports possible unauthorized account access."
+},
+"expected_difficulty":"medium",
+"notes":"Security-related account issue."
+},
+
+{
+"id":"email_033",
+"input":"Remove my subscription immediately",
+"expected_output":{
+"category":"account",
+"summary":"Customer wants to cancel their subscription."
+},
+"expected_difficulty":"medium",
+"notes":"Account management request."
+},
+
+{
+"id":"email_034",
+"input":"Can I change my username?",
+"expected_output":{
+"category":"account",
+"summary":"Customer wants to modify account information."
+},
+"expected_difficulty":"easy",
+"notes":"Account settings change."
+},
+
+
+{
+"id":"email_035",
+"input":"The button disappeared after installation",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports missing functionality after installation."
+},
+"expected_difficulty":"medium",
+"notes":"Feature availability issue."
+},
+
+{
+"id":"email_036",
+"input":"Everything is broken and I have a deadline tomorrow",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports a serious technical problem."
+},
+"expected_difficulty":"medium",
+"notes":"Stressful user language."
+},
+
+{
+"id":"email_037",
+"input":"Why am I being charged every month?",
+"expected_output":{
+"category":"billing",
+"summary":"Customer asks about recurring subscription charges."
+},
+"expected_difficulty":"easy",
+"notes":"Recurring billing question."
+},
+
+{
+"id":"email_038",
+"input":"I don't understand your pricing",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks for pricing information."
+},
+"expected_difficulty":"easy",
+"notes":"General product question."
+},
+
+{
+"id":"email_039",
+"input":"Can you explain how this works?",
+"expected_output":{
+"category":"general",
+"summary":"Customer requests an explanation of the service."
+},
+"expected_difficulty":"easy",
+"notes":"General information request."
+},
+
+{
+"id":"email_040",
+"input":"asdfghjkl",
+"expected_output":{
+"category":"general",
+"summary":"Customer message is unclear and contains invalid text."
+},
+"expected_difficulty":"hard",
+"notes":"Random noisy input handling."
+}
+
+]
+,[
+{
+"id":"email_041",
+"input":"No puedo iniciar sesión en mi cuenta, olvidé mi contraseña.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot login because they forgot their password."
+},
+"expected_difficulty":"hard",
+"notes":"Spanish account access request."
+},
+
+{
+"id":"email_042",
+"input":"Me cobraron dos veces por la misma suscripción.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged twice for the same subscription."
+},
+"expected_difficulty":"hard",
+"notes":"Spanish duplicate payment issue."
+},
+
+{
+"id":"email_043",
+"input":"La aplicación no funciona después de la actualización.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports application failure after an update."
+},
+"expected_difficulty":"hard",
+"notes":"Spanish technical issue."
+},
+
+{
+"id":"email_044",
+"input":"¿Cómo puedo contactar con soporte?",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks how to contact support."
+},
+"expected_difficulty":"medium",
+"notes":"Spanish general inquiry."
+},
+
+{
+"id":"email_045",
+"input":"Je ne peux pas accéder à mon compte.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot access their account."
+},
+"expected_difficulty":"hard",
+"notes":"French account problem."
+},
+
+
+{
+"id":"email_046",
+"input":"J'ai été facturé deux fois pour mon abonnement.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged twice for a subscription."
+},
+"expected_difficulty":"hard",
+"notes":"French billing issue."
+},
+
+{
+"id":"email_047",
+"input":"L'application plante lorsque je l'ouvre.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports that the application crashes when opened."
+},
+"expected_difficulty":"hard",
+"notes":"French technical complaint."
+},
+
+{
+"id":"email_048",
+"input":"Pouvez-vous m'expliquer votre service ?",
+"expected_output":{
+"category":"general",
+"summary":"Customer requests information about the service."
+},
+"expected_difficulty":"medium",
+"notes":"French product inquiry."
+},
+
+{
+"id":"email_049",
+"input":"Ich kann mich nicht anmelden.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot login to their account."
+},
+"expected_difficulty":"hard",
+"notes":"German account access issue."
+},
+
+{
+"id":"email_050",
+"input":"Meine Zahlung wurde zweimal abgebucht.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged twice for a payment."
+},
+"expected_difficulty":"hard",
+"notes":"German duplicate charge."
+},
+
+
+{
+"id":"email_051",
+"input":"Die Anwendung funktioniert nicht mehr.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports that the application stopped working."
+},
+"expected_difficulty":"hard",
+"notes":"German technical issue."
+},
+
+{
+"id":"email_052",
+"input":"Was kostet Ihr Produkt?",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks about product pricing."
+},
+"expected_difficulty":"medium",
+"notes":"German pricing inquiry."
+},
+
+{
+"id":"email_053",
+"input":"لا أستطيع تسجيل الدخول إلى حسابي.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot login to their account."
+},
+"expected_difficulty":"hard",
+"notes":"Arabic account issue."
+},
+
+{
+"id":"email_054",
+"input":"تم خصم المال مني مرتين.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged twice."
+},
+"expected_difficulty":"hard",
+"notes":"Arabic billing problem."
+},
+
+{
+"id":"email_055",
+"input":"التطبيق لا يعمل بعد التحديث.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports application failure after update."
+},
+"expected_difficulty":"hard",
+"notes":"Arabic technical problem."
+},
+
+
+{
+"id":"email_056",
+"input":"Ndagusile ukwazi ukungena kwiakhawunti yam.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot access their account."
+},
+"expected_difficulty":"hard",
+"notes":"Non-English account access test."
+},
+
+{
+"id":"email_057",
+"input":"ሂሳቤን መግባት አልቻልኩም።",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot login to their account."
+},
+"expected_difficulty":"hard",
+"notes":"Amharic account access test."
+},
+
+{
+"id":"email_058",
+"input":"ክፍያዬ ሁለት ጊዜ ተቆርጧል።",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged twice."
+},
+"expected_difficulty":"hard",
+"notes":"Amharic billing issue."
+},
+
+{
+"id":"email_059",
+"input":"The app አይሰራም after update.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports that the application does not work after an update."
+},
+"expected_difficulty":"hard",
+"notes":"Mixed English and Amharic."
+},
+
+{
+"id":"email_060",
+"input":"Hola, I cannot login to my account and need help.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot access their account."
+},
+"expected_difficulty":"medium",
+"notes":"Mixed language message."
+}
+]
+,[
+{
+"id":"email_061",
+"input":"i was chargd twise for my subscriptin plz help",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged twice for their subscription."
+},
+"expected_difficulty":"hard",
+"notes":"Misspelled billing complaint."
+},
+
+{
+"id":"email_062",
+"input":"my card was dedcuted but payment not show",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged but payment is not reflected."
+},
+"expected_difficulty":"hard",
+"notes":"Typing errors with payment issue."
+},
+
+{
+"id":"email_063",
+"input":"refund plsss i dont want this charge",
+"expected_output":{
+"category":"billing",
+"summary":"Customer requests a refund for an unwanted charge."
+},
+"expected_difficulty":"medium",
+"notes":"Informal refund request."
+},
+
+{
+"id":"email_064",
+"input":"why u taking money every month??",
+"expected_output":{
+"category":"billing",
+"summary":"Customer asks about recurring monthly charges."
+},
+"expected_difficulty":"medium",
+"notes":"Slang billing question."
+},
+
+{
+"id":"email_065",
+"input":"payment faild again cant buy plan",
+"expected_output":{
+"category":"billing",
+"summary":"Customer cannot complete payment for a plan."
+},
+"expected_difficulty":"medium",
+"notes":"Abbreviated payment problem."
+},
+
+
+{
+"id":"email_066",
+"input":"app crashhhh when i open it fix pls",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports that the application crashes when opened."
+},
+"expected_difficulty":"medium",
+"notes":"Repeated characters and informal language."
+},
+
+{
+"id":"email_067",
+"input":"webiste is very slow loading",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports slow website performance."
+},
+"expected_difficulty":"medium",
+"notes":"Misspelled technical complaint."
+},
+
+{
+"id":"email_068",
+"input":"cant upload fileeee error comes",
+"expected_output":{
+"category":"technical",
+"summary":"Customer cannot upload files because of an error."
+},
+"expected_difficulty":"medium",
+"notes":"Informal technical issue."
+},
+
+{
+"id":"email_069",
+"input":"nothing works after update omg",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports problems after an update."
+},
+"expected_difficulty":"medium",
+"notes":"Emotional noisy technical message."
+},
+
+{
+"id":"email_070",
+"input":"server down?? app dead lol",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports that the application may be unavailable."
+},
+"expected_difficulty":"hard",
+"notes":"Slang and uncertainty."
+},
+
+
+{
+"id":"email_071",
+"input":"forgot passwrd cant acces acount",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot access account because they forgot password."
+},
+"expected_difficulty":"hard",
+"notes":"Multiple spelling errors."
+},
+
+{
+"id":"email_072",
+"input":"logn not workin help",
+"expected_output":{
+"category":"account",
+"summary":"Customer reports login problem."
+},
+"expected_difficulty":"medium",
+"notes":"Short noisy account message."
+},
+
+{
+"id":"email_073",
+"input":"my accnt locked pls unlock",
+"expected_output":{
+"category":"account",
+"summary":"Customer requests help unlocking their account."
+},
+"expected_difficulty":"medium",
+"notes":"Abbreviated account request."
+},
+
+{
+"id":"email_074",
+"input":"cant change my emaill adress",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot update account email address."
+},
+"expected_difficulty":"medium",
+"notes":"Account settings typo."
+},
+
+{
+"id":"email_075",
+"input":"delete my acount asap",
+"expected_output":{
+"category":"account",
+"summary":"Customer requests account deletion."
+},
+"expected_difficulty":"medium",
+"notes":"Misspelled account deletion request."
+},
+
+
+{
+"id":"email_076",
+"input":"wat is ur service about",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks what the service is about."
+},
+"expected_difficulty":"medium",
+"notes":"Informal general question."
+},
+
+{
+"id":"email_077",
+"input":"need info abt pricing",
+"expected_output":{
+"category":"general",
+"summary":"Customer requests pricing information."
+},
+"expected_difficulty":"easy",
+"notes":"Abbreviated inquiry."
+},
+
+{
+"id":"email_078",
+"input":"how do i contact suppport",
+"expected_output":{
+"category":"general",
+"summary":"Customer asks how to contact support."
+},
+"expected_difficulty":"easy",
+"notes":"Simple typo."
+},
+
+{
+"id":"email_079",
+"input":"thx your app is amazng",
+"expected_output":{
+"category":"general",
+"summary":"Customer provides positive feedback."
+},
+"expected_difficulty":"medium",
+"notes":"Positive feedback with typo."
+},
+
+{
+"id":"email_080",
+"input":"helo i have question",
+"expected_output":{
+"category":"general",
+"summary":"Customer has a general question."
+},
+"expected_difficulty":"easy",
+"notes":"Greeting typo."
+}
+]
+,[
+{
+"id":"email_081",
+"input":"I paid for premium but the features are still locked.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer paid for premium but cannot access purchased features."
+},
+"expected_difficulty":"hard",
+"notes":"Could be billing or technical; payment context is primary."
+},
+
+{
+"id":"email_082",
+"input":"The app works but I was charged for something I didn't use.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer disputes a charge for unused service."
+},
+"expected_difficulty":"medium",
+"notes":"Technical functionality works, billing issue remains."
+},
+
+{
+"id":"email_083",
+"input":"I cannot login after changing my subscription.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot access account after subscription change."
+},
+"expected_difficulty":"hard",
+"notes":"Contains billing and account context."
+},
+
+{
+"id":"email_084",
+"input":"My password reset email never arrived and I was charged today.",
+"expected_output":{
+"category":"account",
+"summary":"Customer cannot reset password because reset email was not received."
+},
+"expected_difficulty":"hard",
+"notes":"Multiple issues; access problem is primary."
+},
+
+{
+"id":"email_085",
+"input":"Your service stopped working right after I upgraded.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports service failure after upgrading."
+},
+"expected_difficulty":"hard",
+"notes":"Upgrade creates billing context but failure is technical."
+},
+
+
+{
+"id":"email_086",
+"input":"I want my money back because your app keeps crashing.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports application crashes and requests assistance."
+},
+"expected_difficulty":"hard",
+"notes":"Refund request mixed with technical complaint."
+},
+
+{
+"id":"email_087",
+"input":"Someone used my card and now I cannot access my account.",
+"expected_output":{
+"category":"account",
+"summary":"Customer reports account security issue and access problem."
+},
+"expected_difficulty":"hard",
+"notes":"Security and billing overlap."
+},
+
+{
+"id":"email_088",
+"input":"The website says payment failed but money was removed.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer was charged despite payment failure message."
+},
+"expected_difficulty":"hard",
+"notes":"Payment system inconsistency."
+},
+
+{
+"id":"email_089",
+"input":"I deleted the app because it was bad, can I get a refund?",
+"expected_output":{
+"category":"billing",
+"summary":"Customer requests refund after dissatisfaction with service."
+},
+"expected_difficulty":"medium",
+"notes":"Complaint mixed with refund request."
+},
+
+{
+"id":"email_090",
+"input":"Nothing works and nobody helps me.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports unresolved service problems."
+},
+"expected_difficulty":"hard",
+"notes":"Very vague complaint."
+},
+
+
+{
+"id":"email_091",
+"input":"Is my account broken or is your system down?",
+"expected_output":{
+"category":"technical",
+"summary":"Customer suspects a system problem affecting access."
+},
+"expected_difficulty":"hard",
+"notes":"Account and technical ambiguity."
+},
+
+{
+"id":"email_092",
+"input":"I don't know why you keep charging me.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer questions repeated charges."
+},
+"expected_difficulty":"medium",
+"notes":"Recurring billing ambiguity."
+},
+
+{
+"id":"email_093",
+"input":"Please fix my account payment problem.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer needs help with account payment issue."
+},
+"expected_difficulty":"hard",
+"notes":"Account and billing overlap."
+},
+
+{
+"id":"email_094",
+"input":"Your update ruined everything, I cannot do anything now.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports problems after an update."
+},
+"expected_difficulty":"medium",
+"notes":"Emotional technical complaint."
+},
+
+{
+"id":"email_095",
+"input":"I need help with my account but I forgot what email I used.",
+"expected_output":{
+"category":"account",
+"summary":"Customer needs account recovery assistance."
+},
+"expected_difficulty":"medium",
+"notes":"Identity and access issue."
+},
+
+
+{
+"id":"email_096",
+"input":"Great product, but why did my bill increase?",
+"expected_output":{
+"category":"billing",
+"summary":"Customer asks about an increased bill."
+},
+"expected_difficulty":"medium",
+"notes":"Positive feedback combined with billing question."
+},
+
+{
+"id":"email_097",
+"input":"Everything is fine except notifications don't work.",
+"expected_output":{
+"category":"technical",
+"summary":"Customer reports notification functionality issue."
+},
+"expected_difficulty":"medium",
+"notes":"Mostly positive message with technical problem."
+},
+
+{
+"id":"email_098",
+"input":"Can you explain why I cannot access the premium features?",
+"expected_output":{
+"category":"billing",
+"summary":"Customer cannot access paid premium features."
+},
+"expected_difficulty":"hard",
+"notes":"Subscription access issue."
+},
+
+{
+"id":"email_099",
+"input":"I changed my card and now my account has problems.",
+"expected_output":{
+"category":"billing",
+"summary":"Customer has payment-related account problems after changing card."
+},
+"expected_difficulty":"hard",
+"notes":"Payment method change ambiguity."
+},
+
+{
+"id":"email_100",
+"input":"I am unhappy with everything and want someone to look into this.",
+"expected_output":{
+"category":"general",
+"summary":"Customer requests general assistance."
+},
+"expected_difficulty":"hard",
+"notes":"No specific category information."
+}
+]
+]
