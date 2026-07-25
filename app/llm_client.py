@@ -33,8 +33,11 @@ class LLMClient:
                     "content": user_prompt,
                 },
             ],
+            format="json",
             options={
-                "temperature": temperature,
+                "temperature": 1.0,
+                "num_predict": 128,
+                "seed": 42,
             },
         )
 

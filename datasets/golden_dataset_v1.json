@@ -220,9 +220,7 @@
 },
 "expected_difficulty":"easy",
 "notes":"Positive message"
-}
-,
-[
+},
 {
 "id":"email_021",
 "input":"",
@@ -444,10 +442,7 @@
 },
 "expected_difficulty":"hard",
 "notes":"Random noisy input handling."
-}
-
-]
-,[
+},
 {
 "id":"email_041",
 "input":"No puedo iniciar sesión en mi cuenta, olvidé mi contraseña.",
@@ -669,9 +664,7 @@
 },
 "expected_difficulty":"medium",
 "notes":"Mixed language message."
-}
-]
-,[
+},
 {
 "id":"email_061",
 "input":"i was chargd twise for my subscriptin plz help",
@@ -893,9 +886,7 @@
 },
 "expected_difficulty":"easy",
 "notes":"Greeting typo."
-}
-]
-,[
+},
 {
 "id":"email_081",
 "input":"I paid for premium but the features are still locked.",
@@ -1118,5 +1109,4 @@
 "expected_difficulty":"hard",
 "notes":"No specific category information."
 }
-]
 ]
