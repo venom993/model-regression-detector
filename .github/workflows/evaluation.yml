@@ -11,7 +11,10 @@ jobs:
 
   evaluate:
 
-    runs-on: ubuntu-latest
+    runs-on:
+  - self-hosted
+  - Windows
+  - X64
 
     steps:
 
@@ -32,11 +35,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run evaluation
-
-        run: |
-
-          python -m app.runner
+      - - name: Run evaluation
+  env:
+    LLM_PROVIDER: ollama
+    OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
+    OLLAMA_HOST: ${{ secrets.OLLAMA_HOST }}
+    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  run: |
+    python -m app.runner
 
       - name: Upload reports
 

@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  regression-detector:
+    build: .
+    container_name: model-regression-detector
+
+    environment:
+      LLM_PROVIDER: ollama
+      OLLAMA_HOST: http://host.docker.internal:11434
+      OLLAMA_MODEL: llama3.2:3b
+
+    volumes:
+      - ./history:/app/history
+      - ./reports:/app/reports

@@ -1,4 +1,5 @@
 import json
+import sys
 from pathlib import Path
 from app.history import HistoryManager
 from app.config import OLLAMA_MODEL
@@ -128,3 +129,8 @@ notifier.send(
     prompt_version=evaluator.prompt.version,
     model=OLLAMA_MODEL,
 )
+if comparison["status"] == "CRITICAL":
+
+    print("\nCritical regression detected.")
+
+    sys.exit(1)
