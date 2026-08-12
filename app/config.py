@@ -20,6 +20,4 @@ DATABASE_PATH = os.getenv(
     "history/evals.db"
 )
 
-SLACK_WEBHOOK_URL = os.getenv(
-    "SLACK_WEBHOOK_URL"
-)
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
