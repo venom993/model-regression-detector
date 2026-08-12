@@ -26,9 +26,14 @@ class RegressionDetector:
         previous = self.previous_run()
 
         if previous is None:
-            return {
-                "status": "FIRST_RUN"
-            }
+         return {
+        "status": "FIRST_RUN",
+        "previous_accuracy": None,
+        "current_accuracy": current_accuracy,
+        "delta": 0,
+        "regressions": [],
+        "improvements": [],
+    }
 
         previous_accuracy = previous["accuracy"]
 
