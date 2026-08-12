@@ -43,14 +43,8 @@ jobs:
         run: |
           python -m app.runner
 
-      - name: Upload reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: evaluation-report
-          path: reports/
-
-      - name: Persist evaluation history
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Commit evaluation history
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: powershell
         run: |
           git config user.name "github-actions[bot]"
@@ -62,6 +56,13 @@ jobs:
             Write-Host "No new history files to commit."
           }
           else {
-            git commit -m "Persist evaluation history"
-            git push
+            git commit -m "Update evaluation history"
+            git push origin HEAD:main
           }
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: reports/
