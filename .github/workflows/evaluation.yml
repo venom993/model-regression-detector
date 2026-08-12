@@ -7,7 +7,11 @@ on:
 
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
+
   evaluate:
 
     runs-on:
@@ -16,7 +20,14 @@ jobs:
       - X64
 
     steps:
-      - uses: actions/checkout@v4
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -37,3 +48,20 @@ jobs:
         with:
           name: evaluation-report
           path: reports/
+
+      - name: Persist evaluation history
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: powershell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add history/
+
+          if (git diff --cached --quiet) {
+            Write-Host "No new history files to commit."
+          }
+          else {
+            git commit -m "Persist evaluation history"
+            git push
+          }
