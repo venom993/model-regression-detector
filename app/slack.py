@@ -5,16 +5,32 @@ from app.config import SLACK_WEBHOOK_URL
 
 class SlackNotifier:
 
-    def send(
-        self,
-        comparison,
-        prompt_version,
-        model,
-    ):
+   def send(
+    self,
+    comparison,
+    prompt_version,
+    model,
+):
 
-        if not SLACK_WEBHOOK_URL:
-            print("Slack webhook not configured.")
-            return
+    if not SLACK_WEBHOOK_URL:
+        print("Slack webhook not configured.")
+        return
+
+    if comparison["status"] == "FIRST_RUN":
+
+        message = f"""
+*Model Regression Report*
+
+Model: {model}
+
+Prompt Version: {prompt_version}
+
+Status: FIRST_RUN
+
+No previous evaluation found.
+"""
+
+    else:
 
         message = f"""
 *Model Regression Report*
@@ -42,14 +58,12 @@ Improvements:
 {len(comparison["improvements"])}
 """
 
-        requests.post(
+    response = requests.post(
+        SLACK_WEBHOOK_URL,
+        json={"text": message},
+        timeout=10
+    )
 
-            SLACK_WEBHOOK_URL,
+    response.raise_for_status()
 
-            json={
-                "text": message
-            }
-
-        )
-
-        print("Slack notification sent.")
+    print("Slack notification sent.")

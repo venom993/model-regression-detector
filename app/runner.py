@@ -47,44 +47,51 @@ comparison = detector.compare(
     accuracy
 )
 
+
 print("\n===================")
 print("Evaluation Results")
 print("===================")
 
-print(
-    f"Accuracy: {accuracy}%"
-)
-
+print(f"Accuracy: {accuracy}%")
 
 print("\nCategory Breakdown:")
-
 print(breakdown)
+
 print("\nRegression Report")
 print("=================")
 
-print(f"Previous Accuracy : {comparison['previous_accuracy']}")
-print(f"Current Accuracy  : {comparison['current_accuracy']}")
-print(f"Delta             : {comparison['delta']}%")
-print(f"Status            : {comparison['status']}")
+if comparison["status"] == "FIRST_RUN":
 
-print("\nRegressions:", len(comparison["regressions"]))
+        print("Status            : FIRST_RUN")
+        print("No previous evaluation found.")
 
-for case in comparison["regressions"]:
+else:
 
-    print(
-        f" - {case['id']} "
-        f"({case['expected_category']} -> "
-        f"{case['predicted_category']})"
-    )
+        print(f"Previous Accuracy : {comparison['previous_accuracy']}")
+        print(f"Current Accuracy  : {comparison['current_accuracy']}")
+        print(f"Delta             : {comparison['delta']}%")
+        print(f"Status            : {comparison['status']}")
 
-print("\nImprovements:", len(comparison["improvements"]))
+        if comparison["status"] != "FIRST_RUN":
 
-for case in comparison["improvements"]:
+            print("\nRegressions:", len(comparison["regressions"]))
+            for case in comparison["regressions"]:
+                print(
+                    f" - {case['id']} "
+                    f"({case['expected_category']} -> "
+                    f"{case['predicted_category']})"
+                )
 
-    print(
-        f" + {case['id']} "
-        f"({case['expected_category']})"
-    )
+        if comparison["status"] != "FIRST_RUN":
+
+            print("\nImprovements:", len(comparison["improvements"]))
+
+        for case in comparison["improvements"]:
+            print(
+                f" + {case['id']} "
+                f"({case['expected_category']})"
+            )
+
 
 
 Path("reports").mkdir(
