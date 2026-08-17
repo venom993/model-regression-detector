@@ -141,3 +141,4 @@ if comparison["status"] == "CRITICAL":
     print("\nCritical regression detected.")
 
     sys.exit(1)
+    print("CI regression test run")
