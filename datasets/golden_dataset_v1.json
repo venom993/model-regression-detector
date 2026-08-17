@@ -59,7 +59,7 @@
 "id":"email_006",
 "input":"The mobile app crashes when I open it.",
 "expected_output":{
-"category":"billing",
+"category":"technical",
 "summary":"Customer reports that the mobile app crashes."
 },
 "expected_difficulty":"easy",
@@ -70,7 +70,7 @@
 "id":"email_007",
 "input":"The website is loading very slowly.",
 "expected_output":{
-"category":"technical",
+"category":"billing",
 "summary":"Customer reports slow website performance."
 },
 "expected_difficulty":"easy",
