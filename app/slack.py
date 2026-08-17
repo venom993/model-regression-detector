@@ -4,66 +4,33 @@ from app.config import SLACK_WEBHOOK_URL
 
 
 class SlackNotifier:
+    def __init__(self):
+        self.webhook_url = SLACK_WEBHOOK_URL
 
-   def send(
-    self,
-    comparison,
-    prompt_version,
-    model,
-):
+    def send(self, comparison, prompt_version, model):
+        message = (
+            "🤖 LLM Regression Detector\n\n"
+            f"Model: {model}\n"
+            f"Prompt Version: {prompt_version}\n"
+            f"Previous Accuracy: {comparison.get('previous_accuracy')}\n"
+            f"Current Accuracy: {comparison.get('current_accuracy')}\n"
+            f"Delta: {comparison.get('delta')}%\n"
+            f"Status: {comparison.get('status')}"
+        )
 
-    if not SLACK_WEBHOOK_URL:
-        print("Slack webhook not configured.")
-        return
+        if not self.webhook_url:
+            print("Slack webhook is not configured.")
+            return
 
-    if comparison["status"] == "FIRST_RUN":
+        try:
+            response = requests.post(
+                self.webhook_url,
+                json={"text": message},
+                timeout=30
+            )
 
-        message = f"""
-*Model Regression Report*
+            print("Slack HTTP status:", response.status_code)
+            print("Slack response:", response.text)
 
-Model: {model}
-
-Prompt Version: {prompt_version}
-
-Status: FIRST_RUN
-
-No previous evaluation found.
-"""
-
-    else:
-
-        message = f"""
-*Model Regression Report*
-
-Model: {model}
-
-Prompt Version: {prompt_version}
-
-Previous Accuracy:
-{comparison["previous_accuracy"]}%
-
-Current Accuracy:
-{comparison["current_accuracy"]}%
-
-Delta:
-{comparison["delta"]}%
-
-Status:
-{comparison["status"]}
-
-Regressions:
-{len(comparison["regressions"])}
-
-Improvements:
-{len(comparison["improvements"])}
-"""
-
-    response = requests.post(
-        SLACK_WEBHOOK_URL,
-        json={"text": message},
-        timeout=10
-    )
-
-    response.raise_for_status()
-
-    print("Slack notification sent.")
+        except requests.exceptions.RequestException as e:
+            print(f"Slack notification failed: {e}")
