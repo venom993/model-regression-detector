@@ -59,7 +59,7 @@
 "id":"email_006",
 "input":"The mobile app crashes when I open it.",
 "expected_output":{
-"category":"technical",
+"category":"billing",
 "summary":"Customer reports that the mobile app crashes."
 },
 "expected_difficulty":"easy",
@@ -126,7 +126,7 @@
 "id":"email_012",
 "input":"I cannot login to my account.",
 "expected_output":{
-"category":"account",
+"category":"technical",
 "summary":"Customer cannot access their account."
 },
 "expected_difficulty":"easy",
@@ -137,7 +137,7 @@
 "id":"email_013",
 "input":"Please change the email address connected to my account.",
 "expected_output":{
-"category":"account",
+"category":"technical",
 "summary":"Customer wants to update account email."
 },
 "expected_difficulty":"easy",
@@ -148,7 +148,7 @@
 "id":"email_014",
 "input":"My account has been locked.",
 "expected_output":{
-"category":"account",
+"category":"technical",
 "summary":"Customer account is locked."
 },
 "expected_difficulty":"easy",
@@ -159,7 +159,7 @@
 "id":"email_015",
 "input":"I want to delete my account.",
 "expected_output":{
-"category":"account",
+"category":"technical",
 "summary":"Customer requests account deletion."
 },
 "expected_difficulty":"easy",
@@ -171,7 +171,7 @@
 "id":"email_016",
 "input":"What features does your service provide?",
 "expected_output":{
-"category":"general",
+"category":"technical",
 "summary":"Customer asks about available features."
 },
 "expected_difficulty":"easy",
@@ -182,7 +182,7 @@
 "id":"email_017",
 "input":"Where can I learn more about your product?",
 "expected_output":{
-"category":"general",
+"category":"technical",
 "summary":"Customer requests product information."
 },
 "expected_difficulty":"easy",
@@ -193,7 +193,7 @@
 "id":"email_018",
 "input":"Do you offer discounts?",
 "expected_output":{
-"category":"general",
+"category":"technical",
 "summary":"Customer asks about discounts."
 },
 "expected_difficulty":"easy",
@@ -204,7 +204,7 @@
 "id":"email_019",
 "input":"How can I contact support?",
 "expected_output":{
-"category":"general",
+"category":"technical",
 "summary":"Customer asks how to contact support."
 },
 "expected_difficulty":"easy",
@@ -215,7 +215,7 @@
 "id":"email_020",
 "input":"Thank you, your service is excellent.",
 "expected_output":{
-"category":"general",
+"category":"technical",
 "summary":"Customer provides positive feedback."
 },
 "expected_difficulty":"easy",

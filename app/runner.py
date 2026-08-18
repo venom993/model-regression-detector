@@ -1,16 +1,14 @@
 import json
 import sys
 from pathlib import Path
+
 from app.history import HistoryManager
 from app.config import OLLAMA_MODEL
 from app.regression import RegressionDetector
 from app.evaluator import Evaluator
 from app.report import HTMLReport
 from app.slack import SlackNotifier
-from app.metrics import (
-    calculate_accuracy,
-    category_breakdown
-)
+from app.metrics import calculate_accuracy, category_breakdown
 
 
 evaluator = Evaluator()
@@ -23,30 +21,23 @@ for i, result in enumerate(results):
     if "expected_category" not in result:
         print(f"\nMissing expected_category at index {i}")
         print(result)
+
+
 accuracy = calculate_accuracy(results)
 breakdown = category_breakdown(results)
 
-history = HistoryManager()
+# --------------------------------------------------
+# REGRESSION CHECK
+# --------------------------------------------------
 
-history_file = history.save_run(
-
-    prompt_version=evaluator.prompt.version,
-
-    model=OLLAMA_MODEL,
-
-    accuracy=accuracy,
-
-    category_breakdown=breakdown,
-
-    results=results,
-)
 detector = RegressionDetector()
 
+# IMPORTANT:
+# Compare BEFORE saving the current run.
 comparison = detector.compare(
     results,
     accuracy
 )
-
 
 print("\n===================")
 print("Evaluation Results")
@@ -62,42 +53,77 @@ print("=================")
 
 if comparison["status"] == "FIRST_RUN":
 
-        print("Status            : FIRST_RUN")
-        print("No previous evaluation found.")
+    print("Status            : FIRST_RUN")
+    print("No previous evaluation found.")
 
 else:
 
-        print(f"Previous Accuracy : {comparison['previous_accuracy']}")
-        print(f"Current Accuracy  : {comparison['current_accuracy']}")
-        print(f"Delta             : {comparison['delta']}%")
-        print(f"Status            : {comparison['status']}")
+    print(
+        f"Previous Accuracy : "
+        f"{comparison['previous_accuracy']}"
+    )
 
-        if comparison["status"] != "FIRST_RUN":
+    print(
+        f"Current Accuracy  : "
+        f"{comparison['current_accuracy']}"
+    )
 
-            print("\nRegressions:", len(comparison["regressions"]))
-            for case in comparison["regressions"]:
-                print(
-                    f" - {case['id']} "
-                    f"({case['expected_category']} -> "
-                    f"{case['predicted_category']})"
-                )
+    print(
+        f"Delta             : "
+        f"{comparison['delta']}%"
+    )
 
-        if comparison["status"] != "FIRST_RUN":
+    print(
+        f"Status            : "
+        f"{comparison['status']}"
+    )
 
-            print("\nImprovements:", len(comparison["improvements"]))
+    print(
+        "\nRegressions:",
+        len(comparison["regressions"])
+    )
 
-        for case in comparison["improvements"]:
-            print(
-                f" + {case['id']} "
-                f"({case['expected_category']})"
-            )
+    for case in comparison["regressions"]:
+        print(
+            f" - {case['id']} "
+            f"({case['expected_category']} -> "
+            f"{case['predicted_category']})"
+        )
+
+    print(
+        "\nImprovements:",
+        len(comparison["improvements"])
+    )
+
+    for case in comparison["improvements"]:
+        print(
+            f" + {case['id']} "
+            f"({case['expected_category']})"
+        )
 
 
+# --------------------------------------------------
+# SAVE CURRENT RUN AFTER COMPARISON
+# --------------------------------------------------
 
-Path("reports").mkdir(
-    exist_ok=True
+history = HistoryManager()
+
+history_file = history.save_run(
+    prompt_version=evaluator.prompt.version,
+    model=OLLAMA_MODEL,
+    accuracy=accuracy,
+    category_breakdown=breakdown,
+    results=results,
 )
 
+print(f"\nHistory saved: {history_file}")
+
+
+# --------------------------------------------------
+# JSON REPORT
+# --------------------------------------------------
+
+Path("reports").mkdir(exist_ok=True)
 
 with open(
     "reports/evaluation_result.json",
@@ -112,12 +138,18 @@ with open(
         ensure_ascii=False
     )
 
-
 print(
     "\nReport saved:"
     " reports/evaluation_result.json"
 )
-history = HistoryManager().get_history()
+
+
+# --------------------------------------------------
+# HTML REPORT
+# --------------------------------------------------
+
+history_data = HistoryManager().get_history()
+
 report = HTMLReport()
 
 report_path = report.generate(
@@ -125,10 +157,18 @@ report_path = report.generate(
     breakdown=breakdown,
     prompt_version=evaluator.prompt.version,
     model=OLLAMA_MODEL,
-    history=history,
+    history=history_data,
 )
 
-print(f"\nHTML Report saved to:\n{report_path}")
+print(
+    f"\nHTML Report saved to:\n{report_path}"
+)
+
+
+# --------------------------------------------------
+# SLACK
+# --------------------------------------------------
+
 notifier = SlackNotifier()
 
 notifier.send(
@@ -136,9 +176,16 @@ notifier.send(
     prompt_version=evaluator.prompt.version,
     model=OLLAMA_MODEL,
 )
+
+
+# --------------------------------------------------
+# CI FAILURE
+# --------------------------------------------------
+
 if comparison["status"] == "CRITICAL":
 
     print("\nCritical regression detected.")
 
     sys.exit(1)
-    print("CI regression test run")
+
+print("\nCI regression test run")
