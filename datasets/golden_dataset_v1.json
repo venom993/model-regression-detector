@@ -3,7 +3,7 @@
 "id":"email_001",
 "input":"I was charged twice for my subscription this month.",
 "expected_output":{
-"category":"technical",
+"category":"billing",
 "summary":"Customer was charged twice for a subscription."
 },
 "expected_difficulty":"easy",
@@ -14,7 +14,7 @@
 "id":"email_002",
 "input":"I need a refund because I was billed incorrectly.",
 "expected_output":{
-"category":"technical",
+"category":"billing",
 "summary":"Customer requests a refund for an incorrect charge."
 },
 "expected_difficulty":"easy",
@@ -25,7 +25,7 @@
 "id":"email_003",
 "input":"My credit card payment is not going through.",
 "expected_output":{
-"category":"technical",
+"category":"billing",
 "summary":"Customer cannot complete payment."
 },
 "expected_difficulty":"easy",
@@ -36,7 +36,7 @@
 "id":"email_004",
 "input":"Why did my monthly plan price increase?",
 "expected_output":{
-"category":"technical",
+"category":"billing",
 "summary":"Customer asks about subscription price increase."
 },
 "expected_difficulty":"easy",
@@ -47,7 +47,7 @@
 "id":"email_005",
 "input":"I don't recognize this charge on my account.",
 "expected_output":{
-"category":"technical",
+"category":"billing",
 "summary":"Customer reports an unknown charge."
 },
 "expected_difficulty":"medium",
@@ -59,7 +59,7 @@
 "id":"email_006",
 "input":"The mobile app crashes when I open it.",
 "expected_output":{
-"category":"billing",
+"category":"technical",
 "summary":"Customer reports that the mobile app crashes."
 },
 "expected_difficulty":"easy",
@@ -70,7 +70,7 @@
 "id":"email_007",
 "input":"The website is loading very slowly.",
 "expected_output":{
-"category":"billing",
+"category":"technical",
 "summary":"Customer reports slow website performance."
 },
 "expected_difficulty":"easy",
@@ -81,7 +81,7 @@
 "id":"email_008",
 "input":"I cannot upload my files.",
 "expected_output":{
-"category":"billing",
+"category":"technical",
 "summary":"Customer cannot upload files."
 },
 "expected_difficulty":"easy",
@@ -92,7 +92,7 @@
 "id":"email_009",
 "input":"The app shows an error every time I click submit.",
 "expected_output":{
-"category":"billing",
+"category":"technical",
 "summary":"Customer encounters an application error."
 },
 "expected_difficulty":"easy",
@@ -103,7 +103,7 @@
 "id":"email_010",
 "input":"The notification system stopped working.",
 "expected_output":{
-"category":"billing",
+"category":"technical",
 "summary":"Customer reports notification failure."
 },
 "expected_difficulty":"easy",
@@ -115,7 +115,7 @@
 "id":"email_011",
 "input":"I forgot my password.",
 "expected_output":{
-"category":"billing",
+"category":"account",
 "summary":"Customer forgot password and needs account access."
 },
 "expected_difficulty":"easy",
@@ -126,7 +126,7 @@
 "id":"email_012",
 "input":"I cannot login to my account.",
 "expected_output":{
-"category":"technical",
+"category":"account",
 "summary":"Customer cannot access their account."
 },
 "expected_difficulty":"easy",
@@ -137,7 +137,7 @@
 "id":"email_013",
 "input":"Please change the email address connected to my account.",
 "expected_output":{
-"category":"technical",
+"category":"account",
 "summary":"Customer wants to update account email."
 },
 "expected_difficulty":"easy",
@@ -148,7 +148,7 @@
 "id":"email_014",
 "input":"My account has been locked.",
 "expected_output":{
-"category":"technical",
+"category":"account",
 "summary":"Customer account is locked."
 },
 "expected_difficulty":"easy",
@@ -159,7 +159,7 @@
 "id":"email_015",
 "input":"I want to delete my account.",
 "expected_output":{
-"category":"technical",
+"category":"account",
 "summary":"Customer requests account deletion."
 },
 "expected_difficulty":"easy",
@@ -171,7 +171,7 @@
 "id":"email_016",
 "input":"What features does your service provide?",
 "expected_output":{
-"category":"technical",
+"category":"general",
 "summary":"Customer asks about available features."
 },
 "expected_difficulty":"easy",
@@ -182,7 +182,7 @@
 "id":"email_017",
 "input":"Where can I learn more about your product?",
 "expected_output":{
-"category":"technical",
+"category":"general",
 "summary":"Customer requests product information."
 },
 "expected_difficulty":"easy",
@@ -193,7 +193,7 @@
 "id":"email_018",
 "input":"Do you offer discounts?",
 "expected_output":{
-"category":"technical",
+"category":"general",
 "summary":"Customer asks about discounts."
 },
 "expected_difficulty":"easy",
@@ -204,7 +204,7 @@
 "id":"email_019",
 "input":"How can I contact support?",
 "expected_output":{
-"category":"technical",
+"category":"general",
 "summary":"Customer asks how to contact support."
 },
 "expected_difficulty":"easy",
@@ -215,7 +215,7 @@
 "id":"email_020",
 "input":"Thank you, your service is excellent.",
 "expected_output":{
-"category":"technical",
+"category":"general",
 "summary":"Customer provides positive feedback."
 },
 "expected_difficulty":"easy",
