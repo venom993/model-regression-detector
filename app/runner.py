@@ -9,7 +9,7 @@ from app.evaluator import Evaluator
 from app.report import HTMLReport
 from app.slack import SlackNotifier
 from app.metrics import calculate_accuracy, category_breakdown
-
+from app.trends import TrendAnalyzer
 
 evaluator = Evaluator()
 
@@ -58,44 +58,71 @@ if comparison["status"] == "FIRST_RUN":
 
 else:
 
-    print(
-        f"Previous Accuracy : "
-        f"{comparison['previous_accuracy']}"
-    )
+    print("\nAccuracy Regression")
+    print("===================")
 
     print(
-        f"Current Accuracy  : "
-        f"{comparison['current_accuracy']}"
-    )
+    f"Previous Accuracy : "
+    f"{comparison['previous_accuracy']}"
+)
 
     print(
-        f"Delta             : "
-        f"{comparison['delta']}%"
-    )
+    f"Current Accuracy  : "
+    f"{comparison['current_accuracy']}"
+)
 
     print(
-        f"Status            : "
-        f"{comparison['status']}"
-    )
+    f"Delta             : "
+    f"{comparison['delta']}%"
+)
 
     print(
+    f"Status            : "
+    f"{comparison['status']}"
+)
+
+
+print("\nPerformance Regression")
+print("======================")
+
+print(
+    f"Previous Avg Latency : "
+    f"{comparison['previous_average_latency']} seconds"
+)
+
+print(
+    f"Current Avg Latency  : "
+    f"{comparison['current_average_latency']} seconds"
+)
+
+print(
+    f"Latency Delta        : "
+    f"{comparison['latency_delta']}%"
+)
+
+print(
+    f"Status               : "
+    f"{comparison['latency_status']}"
+)
+
+print(
         "\nRegressions:",
         len(comparison["regressions"])
     )
 
-    for case in comparison["regressions"]:
+for case in comparison["regressions"]:
         print(
             f" - {case['id']} "
             f"({case['expected_category']} -> "
             f"{case['predicted_category']})"
         )
 
-    print(
+print(
         "\nImprovements:",
         len(comparison["improvements"])
     )
 
-    for case in comparison["improvements"]:
+for case in comparison["improvements"]:
         print(
             f" + {case['id']} "
             f"({case['expected_category']})"
@@ -163,6 +190,23 @@ report_path = report.generate(
 print(
     f"\nHTML Report saved to:\n{report_path}"
 )
+trend_analyzer = TrendAnalyzer()
+
+trend_paths = trend_analyzer.generate()
+
+print(
+    "\nHistorical trend charts generated:"
+)
+
+print(
+    f"Accuracy: "
+    f"{trend_paths['accuracy_chart']}"
+)
+
+print(
+    f"Latency: "
+    f"{trend_paths['latency_chart']}"
+)
 
 
 # --------------------------------------------------
@@ -182,10 +226,11 @@ notifier.send(
 # CI FAILURE
 # --------------------------------------------------
 
-if comparison["status"] == "CRITICAL":
-
+if (
+    comparison["status"] == "CRITICAL"
+    or comparison["latency_status"] == "CRITICAL"
+):
     print("\nCritical regression detected.")
-
     sys.exit(1)
 
 print("\nCI regression test run")

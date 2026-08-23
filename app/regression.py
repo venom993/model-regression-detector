@@ -21,19 +21,46 @@ class RegressionDetector:
         with open(files[-2], encoding="utf-8") as f:
             return json.load(f)
 
+    def calculate_average_latency(self, results):
+        latencies = [
+            item["latency"]
+            for item in results
+            if item.get("latency") is not None
+            and item.get("status") != "error"
+        ]
+
+        if not latencies:
+            return 0
+
+        return round(sum(latencies) / len(latencies), 3)
+
     def compare(self, current_results, current_accuracy):
 
         previous = self.previous_run()
 
+        current_average_latency = self.calculate_average_latency(
+            current_results
+        )
+
         if previous is None:
-         return {
-        "status": "FIRST_RUN",
-        "previous_accuracy": None,
-        "current_accuracy": current_accuracy,
-        "delta": 0,
-        "regressions": [],
-        "improvements": [],
-    }
+            return {
+                "status": "FIRST_RUN",
+                "previous_accuracy": None,
+                "current_accuracy": current_accuracy,
+                "delta": 0,
+
+                "previous_average_latency": None,
+                "current_average_latency": current_average_latency,
+                "latency_delta": 0,
+                "latency_status": "FIRST_RUN",
+
+                "regressions": [],
+                "improvements": [],
+            }
+
+        # ============================
+        # ACCURACY COMPARISON
+        # ============================
 
         previous_accuracy = previous["accuracy"]
 
@@ -41,6 +68,61 @@ class RegressionDetector:
             current_accuracy - previous_accuracy,
             2
         )
+
+        # ============================
+        # LATENCY COMPARISON
+        # ============================
+
+        previous_average_latency = (
+            self.calculate_average_latency(
+                previous["results"]
+            )
+        )
+
+        if previous_average_latency > 0:
+
+            latency_delta = round(
+                (
+                    current_average_latency
+                    - previous_average_latency
+                )
+                / previous_average_latency
+                * 100,
+                2
+            )
+
+        else:
+            latency_delta = 0
+
+        # ============================
+        # ACCURACY STATUS
+        # ============================
+
+        if delta <= -8:
+            level = "CRITICAL"
+
+        elif delta <= -3:
+            level = "WARNING"
+
+        else:
+            level = "PASS"
+
+        # ============================
+        # LATENCY STATUS
+        # ============================
+
+        if latency_delta >= 50:
+            latency_status = "CRITICAL"
+
+        elif latency_delta >= 20:
+            latency_status = "WARNING"
+
+        else:
+            latency_status = "PASS"
+
+        # ============================
+        # CASE REGRESSIONS
+        # ============================
 
         previous_results = {
             item["id"]: item
@@ -56,13 +138,20 @@ class RegressionDetector:
             if item.get("status") == "error":
                 continue
 
-            previous_item = previous_results.get(item["id"])
+            previous_item = previous_results.get(
+                item["id"]
+            )
 
             if previous_item is None:
                 continue
 
-            old_pass = previous_item["status"] == "passed"
-            new_pass = item["status"] == "passed"
+            old_pass = (
+                previous_item["status"] == "passed"
+            )
+
+            new_pass = (
+                item["status"] == "passed"
+            )
 
             if old_pass and not new_pass:
                 regressions.append(item)
@@ -70,18 +159,24 @@ class RegressionDetector:
             elif not old_pass and new_pass:
                 improvements.append(item)
 
-        if delta <= -8:
-            level = "CRITICAL"
-        elif delta <= -3:
-            level = "WARNING"
-        else:
-            level = "PASS"
-
         return {
             "previous_accuracy": previous_accuracy,
             "current_accuracy": current_accuracy,
             "delta": delta,
             "status": level,
+
+            "previous_average_latency":
+                previous_average_latency,
+
+            "current_average_latency":
+                current_average_latency,
+
+            "latency_delta":
+                latency_delta,
+
+            "latency_status":
+                latency_status,
+
             "regressions": regressions,
             "improvements": improvements,
         }
