@@ -38,6 +38,23 @@ comparison = detector.compare(
     results,
     accuracy
 )
+Path("reports").mkdir(exist_ok=True)
+
+with open(
+    "reports/regression_comparison.json",
+    "w",
+    encoding="utf-8"
+) as f:
+    json.dump(
+        comparison,
+        f,
+        indent=2,
+        ensure_ascii=False
+    )
+print(
+    "Regression comparison saved:"
+    " reports/regression_comparison.json"
+)
 
 print("\n===================")
 print("Evaluation Results")

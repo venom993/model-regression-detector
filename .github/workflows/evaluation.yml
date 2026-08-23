@@ -6,9 +6,13 @@ on:
       - main
 
   pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
+  pull-requests: write
+  issues: write
 
 jobs:
 
@@ -35,6 +39,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run evaluation
+        id: evaluation
+        continue-on-error: true
         env:
           LLM_PROVIDER: ollama
           OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
@@ -43,6 +49,53 @@ jobs:
         run: |
           python -m app.runner
 
+      - name: Comment Pull Request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            const comparison = JSON.parse(
+              fs.readFileSync(
+                'reports/regression_comparison.json',
+                'utf8'
+              )
+            );
+
+            const body = `## 🤖 LLM Regression Evaluation
+
+            ### Accuracy Regression
+
+            - Previous Accuracy: ${comparison.previous_accuracy ?? 'N/A'}%
+            - Current Accuracy: ${comparison.current_accuracy}%
+            - Delta: ${comparison.delta}%
+            - Status: **${comparison.status}**
+
+            ### Performance Regression
+
+            - Previous Avg Latency: ${comparison.previous_average_latency ?? 'N/A'} seconds
+            - Current Avg Latency: ${comparison.current_average_latency ?? 'N/A'} seconds
+            - Latency Delta: ${comparison.latency_delta}%
+            - Status: **${comparison.latency_status}**
+
+            ### Case Changes
+
+            - 🔴 Regressions: ${comparison.regressions.length}
+            - 🟢 Improvements: ${comparison.improvements.length}
+            `;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+      - name: Fail CI on critical regression
+        if: steps.evaluation.outcome == 'failure'
+        run: |
+          Write-Host "Critical regression detected."
+          exit 1
       - name: Commit evaluation history
         if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: powershell
