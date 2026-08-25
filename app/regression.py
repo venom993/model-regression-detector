@@ -33,7 +33,22 @@ class RegressionDetector:
             return 0
 
         return round(sum(latencies) / len(latencies), 3)
+    def calculate_average_similarity(self, results):
 
+        similarities = [
+            item["summary_similarity"]
+            for item in results
+            if item.get("summary_similarity") is not None
+            and item.get("status") != "error"
+        ]
+
+        if not similarities:
+            return 0
+
+        return round(
+            sum(similarities) / len(similarities),
+            3
+        )
     def compare(self, current_results, current_accuracy):
 
         previous = self.previous_run()
@@ -41,6 +56,11 @@ class RegressionDetector:
         current_average_latency = self.calculate_average_latency(
             current_results
         )
+        current_average_similarity = (
+    self.calculate_average_similarity(
+        current_results
+    )
+)
 
         if previous is None:
             return {
@@ -53,6 +73,11 @@ class RegressionDetector:
                 "current_average_latency": current_average_latency,
                 "latency_delta": 0,
                 "latency_status": "FIRST_RUN",
+
+                "previous_average_similarity": None,
+                "current_average_similarity": current_average_similarity,
+                "similarity_delta": 0,
+                "similarity_status": "FIRST_RUN",
 
                 "regressions": [],
                 "improvements": [],
@@ -95,6 +120,31 @@ class RegressionDetector:
             latency_delta = 0
 
         # ============================
+        # SEMANTIC SIMILARITY COMPARISON
+        # ============================
+
+        previous_average_similarity = (
+            self.calculate_average_similarity(
+                previous["results"]
+            )
+        )
+
+        if previous_average_similarity > 0:
+
+            similarity_delta = round(
+                (
+                    current_average_similarity
+                    - previous_average_similarity
+                )
+                / previous_average_similarity
+                * 100,
+                2
+            )
+
+        else:
+            similarity_delta = 0
+
+        # ============================
         # ACCURACY STATUS
         # ============================
 
@@ -119,6 +169,19 @@ class RegressionDetector:
 
         else:
             latency_status = "PASS"
+
+        # ============================
+        # SEMANTIC SIMILARITY STATUS
+        # ============================
+
+        if similarity_delta <= -15:
+            similarity_status = "CRITICAL"
+
+        elif similarity_delta <= -7:
+            similarity_status = "WARNING"
+
+        else:
+            similarity_status = "PASS"    
 
         # ============================
         # CASE REGRESSIONS
@@ -176,6 +239,18 @@ class RegressionDetector:
 
             "latency_status":
                 latency_status,
+
+            "previous_average_similarity":
+                previous_average_similarity,
+
+            "current_average_similarity":
+                current_average_similarity,
+
+            "similarity_delta":
+                similarity_delta,
+
+            "similarity_status":
+                similarity_status,
 
             "regressions": regressions,
             "improvements": improvements,

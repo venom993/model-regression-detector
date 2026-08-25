@@ -122,6 +122,42 @@ print(
     f"Status               : "
     f"{comparison['latency_status']}"
 )
+print("\nSemantic Similarity")
+print("===================")
+
+previous_similarity = comparison.get(
+    "previous_average_similarity"
+)
+
+current_similarity = comparison.get(
+    "current_average_similarity"
+)
+
+if previous_similarity is None:
+
+    print("Previous Avg Similarity : N/A")
+
+else:
+
+    print(
+        f"Previous Avg Similarity : "
+        f"{previous_similarity}"
+    )
+
+print(
+    f"Current Avg Similarity  : "
+    f"{current_similarity}"
+)
+
+print(
+    f"Similarity Delta        : "
+    f"{comparison['similarity_delta']}%"
+)
+
+print(
+    f"Status                  : "
+    f"{comparison['similarity_status']}"
+)
 
 print(
         "\nRegressions:",
@@ -247,6 +283,7 @@ notifier.send(
 if (
     comparison["status"] == "CRITICAL"
     or comparison["latency_status"] == "CRITICAL"
+    or comparison["similarity_status"] == "CRITICAL"
 ):
     print("\nCritical regression detected.")
     sys.exit(1)

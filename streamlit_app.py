@@ -24,7 +24,7 @@ st.set_page_config(
 HISTORY_DIR = Path("history")
 
 
-@st.cache_data
+
 def load_history():
     files = sorted(HISTORY_DIR.glob("run_*.json"))
 
@@ -48,6 +48,9 @@ def load_history():
 
 history = load_history()
 
+if st.button("🔄 Refresh Dashboard"):
+    st.cache_data.clear()
+    st.rerun()
 
 # ==================================================
 # HEADER
@@ -127,7 +130,30 @@ def average_latency(run):
         sum(latencies) / len(latencies),
         3
     )
+def average_similarity(run):
 
+    if not run:
+        return None
+
+    results = run.get(
+        "results",
+        []
+    )
+
+    similarities = [
+        item.get("summary_similarity")
+        for item in results
+        if item.get("summary_similarity") is not None
+        and item.get("status") != "error"
+    ]
+
+    if not similarities:
+        return None
+
+    return round(
+        sum(similarities) / len(similarities),
+        3
+    )
 
 current_latency = average_latency(current)
 
@@ -136,6 +162,14 @@ previous_latency = (
     if previous
     else None
 )
+current_similarity = average_similarity(current)
+
+previous_similarity = (
+    average_similarity(previous)
+    if previous
+    else None
+)
+
 
 
 # ==================================================
@@ -172,6 +206,25 @@ if (
         2
     )
 
+similarity_delta = None
+
+if (
+    previous_similarity is not None
+    and current_similarity is not None
+    and previous_similarity > 0
+):
+
+    similarity_delta = round(
+        (
+            (
+                current_similarity
+                - previous_similarity
+            )
+            / previous_similarity
+        )
+        * 100,
+        2
+    )
 
 # ==================================================
 # TOP METRICS
@@ -179,7 +232,7 @@ if (
 
 st.divider()
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
 
@@ -218,6 +271,21 @@ with col3:
         len(history)
     )
 
+with col4:
+
+    st.metric(
+        "Current Avg Similarity",
+        (
+            f"{current_similarity:.3f}"
+            if current_similarity is not None
+            else "N/A"
+        ),
+        (
+            f"{similarity_delta}%"
+            if similarity_delta is not None
+            else None
+        ),
+    )
 
 # ==================================================
 # PREVIOUS RUN INFORMATION
@@ -229,39 +297,55 @@ comparison_data = {
     "Metric": [
         "Accuracy",
         "Average Latency",
+        "Average Semantic Similarity",
     ],
     "Previous": [
-        (
-            f"{previous_accuracy}%"
-            if previous_accuracy is not None
-            else "N/A"
-        ),
-        (
-            f"{previous_latency}s"
-            if previous_latency is not None
-            else "N/A"
-        ),
-    ],
+    (
+        f"{previous_accuracy}%"
+        if previous_accuracy is not None
+        else "N/A"
+    ),
+    (
+        f"{previous_latency}s"
+        if previous_latency is not None
+        else "N/A"
+    ),
+    (
+        f"{previous_similarity}"
+        if previous_similarity is not None
+        else "N/A"
+    ),
+],
     "Current": [
-        f"{current_accuracy}%",
-        (
-            f"{current_latency}s"
-            if current_latency is not None
-            else "N/A"
-        ),
-    ],
+    f"{current_accuracy}%",
+    (
+        f"{current_latency}s"
+        if current_latency is not None
+        else "N/A"
+    ),
+    (
+        f"{current_similarity}"
+        if current_similarity is not None
+        else "N/A"
+    ),
+],
     "Delta": [
-        (
-            f"{accuracy_delta}%"
-            if accuracy_delta is not None
-            else "N/A"
-        ),
-        (
-            f"{latency_delta}%"
-            if latency_delta is not None
-            else "N/A"
-        ),
-    ],
+    (
+        f"{accuracy_delta}%"
+        if accuracy_delta is not None
+        else "N/A"
+    ),
+    (
+        f"{latency_delta}%"
+        if latency_delta is not None
+        else "N/A"
+    ),
+    (
+        f"{similarity_delta}%"
+        if similarity_delta is not None
+        else "N/A"
+    ),
+],
 }
 
 comparison_df = pd.DataFrame(
@@ -285,6 +369,18 @@ for index, run in enumerate(history):
 
     run_latency = average_latency(run)
 
+    run_similarity = average_similarity(run)
+
+    prompt_version = run.get(
+        "prompt_version",
+        "Unknown"
+    )
+
+    # Convert 1.0 -> 1 and 2.0 -> 2
+    if isinstance(prompt_version, float):
+        if prompt_version.is_integer():
+            prompt_version = int(prompt_version)
+
     history_rows.append(
         {
             "Run": index + 1,
@@ -295,9 +391,9 @@ for index, run in enumerate(history):
                 "accuracy"
             ),
             "Average Latency": run_latency,
-            "Prompt Version": run.get(
-                "prompt_version",
-                "Unknown"
+            "Average Similarity": run_similarity,
+            "Prompt Version": str(
+                prompt_version
             ),
             "Model": run.get(
                 "model",
@@ -309,6 +405,22 @@ for index, run in enumerate(history):
 
 history_df = pd.DataFrame(
     history_rows
+)
+# ==================================================
+# DEBUG: DETECTED MODELS
+# ==================================================
+
+st.subheader("🔧 Debug: Models Found in History")
+
+st.write(
+    history_df[
+        ["Filename", "Model"]
+    ]
+)
+st.write("Detected models:")
+
+st.write(
+    history_df["Model"].unique()
 )
 
 
@@ -383,7 +495,727 @@ else:
         "No latency data available."
     )
 
+# ==================================================
+# SEMANTIC SIMILARITY TREND
+# ==================================================
 
+st.subheader("🧠 Semantic Similarity Trend")
+
+similarity_df = history_df.dropna(
+    subset=["Average Similarity"]
+)
+
+if not similarity_df.empty:
+
+    similarity_chart = px.line(
+        similarity_df,
+        x="Run",
+        y="Average Similarity",
+        markers=True,
+        hover_data=[
+            "Filename",
+            "Prompt Version",
+            "Model",
+        ],
+    )
+
+    similarity_chart.update_layout(
+        yaxis_title="Average Semantic Similarity",
+        xaxis_title="Evaluation Run",
+    )
+
+    st.plotly_chart(
+        similarity_chart,
+        use_container_width=True,
+    )
+
+else:
+
+    st.info(
+        "No semantic similarity data available."
+    )
+# ==================================================
+# PROMPT VERSION COMPARISON
+# ==================================================
+
+st.divider()
+
+st.subheader("📝 Prompt Version Comparison")
+
+
+prompt_comparison_rows = []
+
+for prompt_version in sorted(
+    history_df["Prompt Version"]
+    .dropna()
+    .unique()
+):
+
+    prompt_runs = history_df[
+        history_df["Prompt Version"]
+        == prompt_version
+    ]
+
+    average_prompt_accuracy = round(
+        prompt_runs["Accuracy"].mean(),
+        2
+    )
+
+    average_prompt_latency = round(
+        prompt_runs[
+            "Average Latency"
+        ].mean(),
+        3
+    )
+
+    average_prompt_similarity = round(
+        prompt_runs[
+            "Average Similarity"
+        ].mean(),
+        3
+    )
+
+    prompt_comparison_rows.append(
+        {
+            "Prompt Version": prompt_version,
+            "Evaluation Runs": len(prompt_runs),
+            "Avg Accuracy": average_prompt_accuracy,
+            "Avg Latency (s)": average_prompt_latency,
+            "Avg Similarity": average_prompt_similarity,
+        }
+    )
+
+
+prompt_comparison_df = pd.DataFrame(
+    prompt_comparison_rows
+)
+
+
+if not prompt_comparison_df.empty:
+
+    st.dataframe(
+        prompt_comparison_df,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    prompt_accuracy_chart = px.bar(
+        prompt_comparison_df,
+        x="Prompt Version",
+        y="Avg Accuracy",
+        text="Avg Accuracy",
+    )
+
+    prompt_accuracy_chart.update_layout(
+        title="Average Accuracy by Prompt Version",
+        yaxis_title="Average Accuracy (%)",
+        xaxis_title="Prompt Version",
+    )
+
+    st.plotly_chart(
+        prompt_accuracy_chart,
+        use_container_width=True,
+    )
+
+    prompt_latency_chart = px.bar(
+        prompt_comparison_df,
+        x="Prompt Version",
+        y="Avg Latency (s)",
+        text="Avg Latency (s)",
+    )
+
+    prompt_latency_chart.update_layout(
+        title="Average Latency by Prompt Version",
+        yaxis_title="Average Latency (seconds)",
+        xaxis_title="Prompt Version",
+    )
+
+    st.plotly_chart(
+        prompt_latency_chart,
+        use_container_width=True,
+    )
+
+    prompt_similarity_chart = px.bar(
+        prompt_comparison_df,
+        x="Prompt Version",
+        y="Avg Similarity",
+        text="Avg Similarity",
+    )
+
+    prompt_similarity_chart.update_layout(
+        title="Average Semantic Similarity by Prompt Version",
+        yaxis_title="Average Similarity",
+        xaxis_title="Prompt Version",
+    )
+
+    st.plotly_chart(
+        prompt_similarity_chart,
+        use_container_width=True,
+    )
+
+else:
+
+    st.info(
+        "No prompt version data available."
+    )
+
+# ==================================================
+# MODEL-TO-MODEL COMPARISON
+# ==================================================
+
+st.divider()
+
+st.subheader("🤖 Model-to-Model Comparison")
+
+
+# Create the model comparison dataframe
+model_comparison_df = (
+    history_df
+    .groupby("Model", dropna=False)
+    .agg(
+        **{
+            "Evaluation Runs": (
+                "Run",
+                "count"
+            ),
+            "Avg Accuracy": (
+                "Accuracy",
+                "mean"
+            ),
+            "Avg Latency (s)": (
+                "Average Latency",
+                "mean"
+            ),
+            "Avg Similarity": (
+                "Average Similarity",
+                "mean"
+            ),
+        }
+    )
+    .reset_index()
+)
+
+
+# Round the values
+model_comparison_df[
+    "Avg Accuracy"
+] = model_comparison_df[
+    "Avg Accuracy"
+].round(2)
+
+
+model_comparison_df[
+    "Avg Latency (s)"
+] = model_comparison_df[
+    "Avg Latency (s)"
+].round(3)
+
+
+model_comparison_df[
+    "Avg Similarity"
+] = model_comparison_df[
+    "Avg Similarity"
+].round(3)
+
+
+if not model_comparison_df.empty:
+
+    # ----------------------------------------------
+    # MODEL COMPARISON TABLE
+    # ----------------------------------------------
+
+    st.dataframe(
+        model_comparison_df,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+    # ----------------------------------------------
+    # MODEL ACCURACY
+    # ----------------------------------------------
+
+    st.subheader(
+        "🎯 Accuracy by Model"
+    )
+
+    model_accuracy_chart = px.bar(
+        model_comparison_df,
+        x="Model",
+        y="Avg Accuracy",
+        text="Avg Accuracy",
+    )
+
+    model_accuracy_chart.update_layout(
+        yaxis_title="Average Accuracy (%)",
+        xaxis_title="Model",
+    )
+
+    st.plotly_chart(
+        model_accuracy_chart,
+        use_container_width=True,
+    )
+
+
+    # ----------------------------------------------
+    # MODEL LATENCY
+    # ----------------------------------------------
+
+    st.subheader(
+        "⚡ Latency by Model"
+    )
+
+    model_latency_chart = px.bar(
+        model_comparison_df,
+        x="Model",
+        y="Avg Latency (s)",
+        text="Avg Latency (s)",
+    )
+
+    model_latency_chart.update_layout(
+        yaxis_title="Average Latency (seconds)",
+        xaxis_title="Model",
+    )
+
+    st.plotly_chart(
+        model_latency_chart,
+        use_container_width=True,
+    )
+
+
+    # ----------------------------------------------
+    # MODEL SEMANTIC SIMILARITY
+    # ----------------------------------------------
+
+    st.subheader(
+        "🧠 Semantic Similarity by Model"
+    )
+
+    model_similarity_chart = px.bar(
+        model_comparison_df,
+        x="Model",
+        y="Avg Similarity",
+        text="Avg Similarity",
+    )
+
+    model_similarity_chart.update_layout(
+        yaxis_title="Average Semantic Similarity",
+        xaxis_title="Model",
+    )
+
+    st.plotly_chart(
+        model_similarity_chart,
+        use_container_width=True,
+    )
+
+
+    # ==================================================
+    # AUTOMATIC MODEL WINNERS
+    # ==================================================
+
+    st.divider()
+
+    st.subheader(
+        "🏆 Model Performance Winners"
+    )
+
+
+    if len(model_comparison_df) >= 2:
+
+        # Best accuracy
+        best_accuracy_model = (
+            model_comparison_df.loc[
+                model_comparison_df[
+                    "Avg Accuracy"
+                ].idxmax()
+            ]
+        )
+
+
+        # Fastest model
+        latency_models = model_comparison_df.dropna(
+            subset=["Avg Latency (s)"]
+        )
+
+        fastest_model = None
+
+        if not latency_models.empty:
+
+            fastest_model = (
+                latency_models.loc[
+                    latency_models[
+                        "Avg Latency (s)"
+                    ].idxmin()
+                ]
+            )
+
+
+        # Best semantic similarity
+        similarity_models = (
+            model_comparison_df.dropna(
+                subset=["Avg Similarity"]
+            )
+        )
+
+        best_similarity_model = None
+
+        if not similarity_models.empty:
+
+            best_similarity_model = (
+                similarity_models.loc[
+                    similarity_models[
+                        "Avg Similarity"
+                    ].idxmax()
+                ]
+            )
+
+
+        winner_col1, winner_col2, winner_col3 = (
+            st.columns(3)
+        )
+
+
+        # Best Accuracy
+        with winner_col1:
+
+            st.metric(
+                "🎯 Best Accuracy",
+                best_accuracy_model[
+                    "Model"
+                ],
+                (
+                    f'{best_accuracy_model["Avg Accuracy"]}%'
+                ),
+            )
+
+
+        # Fastest Model
+        with winner_col2:
+
+            if fastest_model is not None:
+
+                st.metric(
+                    "⚡ Fastest Model",
+                    fastest_model[
+                        "Model"
+                    ],
+                    (
+                        f'{fastest_model["Avg Latency (s)"]}s'
+                    ),
+                )
+
+            else:
+
+                st.metric(
+                    "⚡ Fastest Model",
+                    "N/A",
+                )
+
+
+        # Best Similarity
+        with winner_col3:
+
+            if best_similarity_model is not None:
+
+                st.metric(
+                    "🧠 Best Similarity",
+                    best_similarity_model[
+                        "Model"
+                    ],
+                    (
+                        f'{best_similarity_model["Avg Similarity"]:.3f}'
+                    ),
+                )
+
+            else:
+
+                st.metric(
+                    "🧠 Best Similarity",
+                    "N/A",
+                )
+
+
+    else:
+
+        st.info(
+            "Run evaluations with at least two "
+            "different models to determine the winners."
+        )
+
+
+else:
+
+    st.info(
+        "No model data available."
+    )
+# ==================================================
+# OVERALL RECOMMENDED MODEL
+# ==================================================
+
+st.divider()
+
+st.subheader("⭐ Overall Recommended Model")
+
+
+if len(model_comparison_df) >= 2:
+
+    recommendation_df = model_comparison_df.copy()
+
+
+    # ----------------------------------------------
+    # NORMALIZE ACCURACY
+    # Higher accuracy = better
+    # ----------------------------------------------
+
+    accuracy_min = recommendation_df[
+        "Avg Accuracy"
+    ].min()
+
+    accuracy_max = recommendation_df[
+        "Avg Accuracy"
+    ].max()
+
+
+    if accuracy_max != accuracy_min:
+
+        recommendation_df[
+            "Accuracy Score"
+        ] = (
+            recommendation_df[
+                "Avg Accuracy"
+            ]
+            - accuracy_min
+        ) / (
+            accuracy_max
+            - accuracy_min
+        )
+
+    else:
+
+        recommendation_df[
+            "Accuracy Score"
+        ] = 1.0
+
+
+    # ----------------------------------------------
+    # NORMALIZE LATENCY
+    # Lower latency = better
+    # ----------------------------------------------
+
+    latency_min = recommendation_df[
+        "Avg Latency (s)"
+    ].min()
+
+    latency_max = recommendation_df[
+        "Avg Latency (s)"
+    ].max()
+
+
+    if latency_max != latency_min:
+
+        recommendation_df[
+            "Latency Score"
+        ] = (
+            latency_max
+            - recommendation_df[
+                "Avg Latency (s)"
+            ]
+        ) / (
+            latency_max
+            - latency_min
+        )
+
+    else:
+
+        recommendation_df[
+            "Latency Score"
+        ] = 1.0
+
+
+    # ----------------------------------------------
+    # NORMALIZE SEMANTIC SIMILARITY
+    # Higher similarity = better
+    # ----------------------------------------------
+
+    similarity_min = recommendation_df[
+        "Avg Similarity"
+    ].min()
+
+    similarity_max = recommendation_df[
+        "Avg Similarity"
+    ].max()
+
+
+    if similarity_max != similarity_min:
+
+        recommendation_df[
+            "Similarity Score"
+        ] = (
+            recommendation_df[
+                "Avg Similarity"
+            ]
+            - similarity_min
+        ) / (
+            similarity_max
+            - similarity_min
+        )
+
+    else:
+
+        recommendation_df[
+            "Similarity Score"
+        ] = 1.0
+
+
+    # ----------------------------------------------
+    # CALCULATE OVERALL SCORE
+    #
+    # Accuracy: 40%
+    # Latency: 30%
+    # Similarity: 30%
+    # ----------------------------------------------
+
+    recommendation_df[
+        "Overall Score"
+    ] = (
+        recommendation_df[
+            "Accuracy Score"
+        ] * 0.40
+        +
+        recommendation_df[
+            "Latency Score"
+        ] * 0.30
+        +
+        recommendation_df[
+            "Similarity Score"
+        ] * 0.30
+    )
+
+
+    # Convert to percentage
+    recommendation_df[
+        "Overall Score"
+    ] = (
+        recommendation_df[
+            "Overall Score"
+        ] * 100
+    ).round(2)
+
+
+    # ----------------------------------------------
+    # FIND BEST MODEL
+    # ----------------------------------------------
+
+    recommended_model = (
+        recommendation_df.loc[
+            recommendation_df[
+                "Overall Score"
+            ].idxmax()
+        ]
+    )
+
+
+    # ----------------------------------------------
+    # SHOW RECOMMENDATION
+    # ----------------------------------------------
+
+    col1, col2 = st.columns(2)
+
+
+    with col1:
+
+        st.metric(
+            "🏆 Recommended Model",
+            recommended_model[
+                "Model"
+            ],
+        )
+
+
+    with col2:
+
+        st.metric(
+            "⭐ Overall Score",
+            (
+                f'{recommended_model["Overall Score"]}%'
+            ),
+        )
+
+
+    # ----------------------------------------------
+    # EXPLANATION
+    # ----------------------------------------------
+
+    st.success(
+        f"🏆 {recommended_model['Model']} is "
+        "currently the best overall model based on "
+        "accuracy, speed, and semantic similarity."
+    )
+
+
+    # ----------------------------------------------
+    # SHOW MODEL SCORES
+    # ----------------------------------------------
+
+    score_display_df = recommendation_df[
+        [
+            "Model",
+            "Avg Accuracy",
+            "Avg Latency (s)",
+            "Avg Similarity",
+            "Overall Score",
+        ]
+    ].sort_values(
+        "Overall Score",
+        ascending=False,
+    )
+
+
+    st.subheader(
+        "📊 Overall Model Rankings"
+    )
+
+
+    st.dataframe(
+        score_display_df,
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+    # ----------------------------------------------
+    # OVERALL SCORE CHART
+    # ----------------------------------------------
+
+    overall_score_chart = px.bar(
+        score_display_df,
+        x="Model",
+        y="Overall Score",
+        text="Overall Score",
+    )
+
+
+    overall_score_chart.update_layout(
+        title="Overall Model Performance Score",
+        yaxis_title="Overall Score (%)",
+        xaxis_title="Model",
+    )
+
+
+    st.plotly_chart(
+        overall_score_chart,
+        use_container_width=True,
+    )
+
+
+else:
+
+    st.info(
+        "Run evaluations with at least two "
+        "different models to get an overall "
+        "model recommendation."
+    )
+    
 # ==================================================
 # CATEGORY PERFORMANCE
 # ==================================================
