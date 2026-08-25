@@ -49,8 +49,12 @@ jobs:
         run: |
           python -m app.runner
 
-      - name: Comment Pull Request
-        if: github.event_name == 'pull_request'
+            # ==============================================
+      # CREATE OR UPDATE PULL REQUEST COMMENT
+      # ==============================================
+
+      - name: Create or Update Pull Request Comment
+        if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
@@ -63,34 +67,140 @@ jobs:
               )
             );
 
-            const body = `## 🤖 LLM Regression Evaluation
+            const previousAccuracy =
+              comparison.previous_accuracy ?? 'N/A';
 
-            ### Accuracy Regression
+            const currentAccuracy =
+              comparison.current_accuracy ?? 'N/A';
 
-            - Previous Accuracy: ${comparison.previous_accuracy ?? 'N/A'}%
-            - Current Accuracy: ${comparison.current_accuracy}%
-            - Delta: ${comparison.delta}%
-            - Status: **${comparison.status}**
+            const accuracyDelta =
+              comparison.delta ?? 'N/A';
 
-            ### Performance Regression
+            const previousLatency =
+              comparison.previous_average_latency ?? 'N/A';
 
-            - Previous Avg Latency: ${comparison.previous_average_latency ?? 'N/A'} seconds
-            - Current Avg Latency: ${comparison.current_average_latency ?? 'N/A'} seconds
-            - Latency Delta: ${comparison.latency_delta}%
-            - Status: **${comparison.latency_status}**
+            const currentLatency =
+              comparison.current_average_latency ?? 'N/A';
 
-            ### Case Changes
+            const latencyDelta =
+              comparison.latency_delta ?? 'N/A';
 
-            - 🔴 Regressions: ${comparison.regressions.length}
-            - 🟢 Improvements: ${comparison.improvements.length}
+            const previousSimilarity =
+              comparison.previous_average_similarity ?? 'N/A';
+
+            const currentSimilarity =
+              comparison.current_average_similarity ?? 'N/A';
+
+            const similarityDelta =
+              comparison.similarity_delta ?? 'N/A';
+
+            const regressions =
+              comparison.regressions?.length ?? 0;
+
+            const improvements =
+              comparison.improvements?.length ?? 0;
+
+            const overallStatus =
+              comparison.status === 'CRITICAL' ||
+              comparison.latency_status === 'CRITICAL' ||
+              comparison.similarity_status === 'CRITICAL'
+                ? '🔴 CRITICAL'
+                : '🟢 PASSED';
+
+            const commentIdentifier =
+              '<!-- llm-regression-evaluation -->';
+
+            const body = `${commentIdentifier}
+
+            ## 🤖 LLM Regression Evaluation
+
+            ### Overall Status
+
+            **${overallStatus}**
+
+            ---
+
+            ### 🎯 Accuracy
+
+            | Metric | Value |
+            |---|---|
+            | Previous Accuracy | ${previousAccuracy}% |
+            | Current Accuracy | ${currentAccuracy}% |
+            | Delta | ${accuracyDelta}% |
+            | Status | **${comparison.status}** |
+
+            ---
+
+            ### ⚡ Performance
+
+            | Metric | Value |
+            |---|---|
+            | Previous Avg Latency | ${previousLatency} seconds |
+            | Current Avg Latency | ${currentLatency} seconds |
+            | Delta | ${latencyDelta}% |
+            | Status | **${comparison.latency_status}** |
+
+            ---
+
+            ### 🧠 Semantic Similarity
+
+            | Metric | Value |
+            |---|---|
+            | Previous Avg Similarity | ${previousSimilarity} |
+            | Current Avg Similarity | ${currentSimilarity} |
+            | Delta | ${similarityDelta}% |
+            | Status | **${comparison.similarity_status}** |
+
+            ---
+
+            ### 🔍 Case Changes
+
+            🔴 **Regressions:** ${regressions}
+
+            🟢 **Improvements:** ${improvements}
             `;
 
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: body
-            });
+            const comments =
+              await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number
+              });
+
+            const existingComment =
+              comments.data.find(comment =>
+                comment.body.includes(
+                  '<!-- llm-regression-evaluation -->'
+                )
+              );
+
+            if (existingComment) {
+
+              console.log(
+                `Updating existing comment: ${existingComment.id}`
+              );
+
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body
+              });
+
+            } else {
+
+              console.log(
+                'Creating new regression evaluation comment.'
+              );
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+
+            }
       - name: Fail CI on critical regression
         if: steps.evaluation.outcome == 'failure'
         run: |
