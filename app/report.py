@@ -242,7 +242,36 @@ class HTMLReport:
                 alt="Latency trend chart"
             >
             """
+            similarity_section = f"""
 
+<h2>Semantic Similarity Regression</h2>
+
+<ul>
+
+<li>
+Previous Avg Similarity:
+{comparison.get("previous_average_similarity", "N/A")}
+</li>
+
+<li>
+Current Avg Similarity:
+{comparison.get("current_average_similarity", "N/A")}
+</li>
+
+<li>
+Similarity Delta:
+{comparison.get("similarity_delta", "N/A")}%
+</li>
+
+<li>
+Status:
+<span class="{comparison.get("similarity_status", "PASS").lower()}">
+{comparison.get("similarity_status", "PASS")}
+</span>
+</li>
+
+</ul>
+"""
         html = f"""
 <!DOCTYPE html>
 
@@ -387,7 +416,7 @@ Status:
 </li>
 
 </ul>
-
+{similarity_section}
 <h2>Category Accuracy</h2>
 
 <table>

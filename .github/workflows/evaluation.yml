@@ -12,36 +12,45 @@ on:
       - opened
       - synchronize
       - reopened
-      
+
 permissions:
   contents: write
   pull-requests: write
   issues: write
 
 jobs:
-
   evaluate:
-
     runs-on:
       - self-hosted
       - Windows
       - X64
 
     steps:
-
+      # ==============================================
+      # CHECKOUT
+      # ==============================================
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ==============================================
+      # SETUP PYTHON
+      # ==============================================
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # ==============================================
+      # INSTALL DEPENDENCIES
+      # ==============================================
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # ==============================================
+      # RUN EVALUATION
+      # ==============================================
       - name: Run evaluation
         id: evaluation
         continue-on-error: true
@@ -53,10 +62,9 @@ jobs:
         run: |
           python -m app.runner
 
-            # ==============================================
+      # ==============================================
       # CREATE OR UPDATE PULL REQUEST COMMENT
       # ==============================================
-
       - name: Create or Update Pull Request Comment
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -111,6 +119,8 @@ jobs:
                 ? '🔴 CRITICAL'
                 : '🟢 PASSED';
 
+            // Unique hidden identifier used to find
+            // the existing GitHub comment.
             const commentIdentifier =
               '<!-- llm-regression-evaluation -->';
 
@@ -164,6 +174,9 @@ jobs:
             🟢 **Improvements:** ${improvements}
             `;
 
+            // ==========================================
+            // FIND EXISTING REGRESSION COMMENT
+            // ==========================================
             const comments =
               await github.rest.issues.listComments({
                 owner: context.repo.owner,
@@ -173,13 +186,13 @@ jobs:
 
             const existingComment =
               comments.data.find(comment =>
-                comment.body.includes(
-                  '<!-- llm-regression-evaluation -->'
-                )
+                comment.body.includes(commentIdentifier)
               );
 
+            // ==========================================
+            // UPDATE EXISTING COMMENT
+            // ==========================================
             if (existingComment) {
-
               console.log(
                 `Updating existing comment: ${existingComment.id}`
               );
@@ -190,9 +203,12 @@ jobs:
                 comment_id: existingComment.id,
                 body: body
               });
+            }
 
-            } else {
-
+            // ==========================================
+            // CREATE NEW COMMENT
+            // ==========================================
+            else {
               console.log(
                 'Creating new regression evaluation comment.'
               );
@@ -203,13 +219,20 @@ jobs:
                 issue_number: context.issue.number,
                 body: body
               });
-
             }
+
+      # ==============================================
+      # FAIL CI ON CRITICAL REGRESSION
+      # ==============================================
       - name: Fail CI on critical regression
-        if: steps.evaluation.outcome == 'failure'
+        if: always() && steps.evaluation.outcome == 'failure'
         run: |
           Write-Host "Critical regression detected."
           exit 1
+
+      # ==============================================
+      # COMMIT EVALUATION HISTORY
+      # ==============================================
       - name: Commit evaluation history
         if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: powershell
@@ -227,6 +250,9 @@ jobs:
             git push origin HEAD:main
           }
 
+      # ==============================================
+      # UPLOAD REPORTS
+      # ==============================================
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4

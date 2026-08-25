@@ -3,7 +3,7 @@ import time
 from app.classifier import EmailClassifier
 from app.prompt_loader import PromptLoader
 from app.dataset_loader import DatasetLoader
-
+from app.semantic import SemanticSimilarity
 
 
 class Evaluator:
@@ -20,7 +20,7 @@ class Evaluator:
         )
 
         self.dataset_loader = DatasetLoader()
-
+        self.semantic_similarity = SemanticSimilarity()
 
 
     def run(self):
@@ -51,6 +51,12 @@ class Evaluator:
                     time.time() - start,
                     3
                 )
+                summary_similarity = (
+    self.semantic_similarity.calculate(
+        item["expected_output"]["summary"],
+        prediction.summary
+    )
+)
 
 
                 results.append({
@@ -65,6 +71,9 @@ class Evaluator:
 
                     "expected_summary":
                     item["expected_output"]["summary"],
+
+                    "summary_similarity":
+                    summary_similarity,
 
                     "predicted_summary":
                     prediction.summary,
