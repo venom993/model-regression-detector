@@ -8,86 +8,68 @@ on:
   pull_request:
     branches:
       - main
-
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
   contents: write
   pull-requests: write
   issues: write
 
-
 jobs:
-
   evaluate:
-
     runs-on:
       - self-hosted
       - Windows
       - X64
 
-
     steps:
-
       # ==============================================
       # CHECKOUT
       # ==============================================
-
       - name: Checkout repository
         uses: actions/checkout@v4
-
 
       # ==============================================
       # SETUP PYTHON
       # ==============================================
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-
       # ==============================================
       # INSTALL DEPENDENCIES
       # ==============================================
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-
       # ==============================================
       # RUN EVALUATION
       # ==============================================
-
       - name: Run evaluation
         id: evaluation
         continue-on-error: true
-
         env:
           LLM_PROVIDER: ollama
           OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
           OLLAMA_HOST: ${{ secrets.OLLAMA_HOST }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
         run: |
           python -m app.runner
 
-
-            # ==============================================
+      # ==============================================
       # CREATE OR UPDATE PULL REQUEST COMMENT
       # ==============================================
-
       - name: Create or Update Pull Request Comment
-
         if: always() && github.event_name == 'pull_request'
-
         uses: actions/github-script@v7
-
         with:
-
           script: |
-
             const fs = require('fs');
 
             const comparison = JSON.parse(
@@ -96,7 +78,6 @@ jobs:
                 'utf8'
               )
             );
-
 
             const previousAccuracy =
               comparison.previous_accuracy ?? 'N/A';
@@ -107,7 +88,6 @@ jobs:
             const accuracyDelta =
               comparison.delta ?? 'N/A';
 
-
             const previousLatency =
               comparison.previous_average_latency ?? 'N/A';
 
@@ -116,7 +96,6 @@ jobs:
 
             const latencyDelta =
               comparison.latency_delta ?? 'N/A';
-
 
             const previousSimilarity =
               comparison.previous_average_similarity ?? 'N/A';
@@ -127,13 +106,11 @@ jobs:
             const similarityDelta =
               comparison.similarity_delta ?? 'N/A';
 
-
             const regressions =
               comparison.regressions?.length ?? 0;
 
             const improvements =
               comparison.improvements?.length ?? 0;
-
 
             const overallStatus =
               comparison.status === 'CRITICAL' ||
@@ -142,8 +119,12 @@ jobs:
                 ? '🔴 CRITICAL'
                 : '🟢 PASSED';
 
+            // Unique hidden identifier used to find
+            // the existing GitHub comment.
+            const commentIdentifier =
+              '<!-- llm-regression-evaluation -->';
 
-            const body = `<!-- llm-regression-report -->
+            const body = `${commentIdentifier}
 
             ## 🤖 LLM Regression Evaluation
 
@@ -193,11 +174,9 @@ jobs:
             🟢 **Improvements:** ${improvements}
             `;
 
-
             // ==========================================
             // FIND EXISTING REGRESSION COMMENT
             // ==========================================
-
             const comments =
               await github.rest.issues.listComments({
                 owner: context.repo.owner,
@@ -205,21 +184,18 @@ jobs:
                 issue_number: context.issue.number
               });
 
-
             const existingComment =
-              comments.data.find(
-                comment =>
-                  comment.body.includes(
-                    '<!-- llm-regression-report -->'
-                  )
+              comments.data.find(comment =>
+                comment.body.includes(commentIdentifier)
               );
-
 
             // ==========================================
             // UPDATE EXISTING COMMENT
             // ==========================================
-
             if (existingComment) {
+              console.log(
+                `Updating existing comment: ${existingComment.id}`
+              );
 
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -227,18 +203,15 @@ jobs:
                 comment_id: existingComment.id,
                 body: body
               });
-
-              console.log(
-                'Updated existing LLM regression comment.'
-              );
-
             }
 
             // ==========================================
             // CREATE NEW COMMENT
             // ==========================================
-
             else {
+              console.log(
+                'Creating new regression evaluation comment.'
+              );
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -246,75 +219,43 @@ jobs:
                 issue_number: context.issue.number,
                 body: body
               });
-
-              console.log(
-                'Created new LLM regression comment.'
-              );
-
             }
 
       # ==============================================
       # FAIL CI ON CRITICAL REGRESSION
       # ==============================================
-
       - name: Fail CI on critical regression
-
         if: always() && steps.evaluation.outcome == 'failure'
-
         run: |
-
           Write-Host "Critical regression detected."
-
           exit 1
-
 
       # ==============================================
       # COMMIT EVALUATION HISTORY
       # ==============================================
-
       - name: Commit evaluation history
-
         if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-
         shell: powershell
-
         run: |
-
           git config user.name "github-actions[bot]"
-
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
 
           git add history/
 
-
           if (git diff --cached --quiet) {
-
             Write-Host "No new history files to commit."
-
-           }
-
+          }
           else {
-
             git commit -m "Update evaluation history"
-
             git push origin HEAD:main
-
-           }
-
+          }
 
       # ==============================================
       # UPLOAD REPORTS
       # ==============================================
-
       - name: Upload reports
-
         if: always()
-
         uses: actions/upload-artifact@v4
-
         with:
-
           name: evaluation-report
-
           path: reports/
