@@ -250,12 +250,4 @@ jobs:
             git push origin HEAD:main
           }
 
-      # ==============================================
-      # UPLOAD REPORTS
-      # ==============================================
-      - name: Upload reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evaluation-report
-          path: reports/
+      
