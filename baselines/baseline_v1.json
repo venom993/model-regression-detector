@@ -1,0 +1,1031 @@
+{
+  "baseline_name": "baseline_v1",
+  "created_at": "2026-08-26 12:08:38",
+  "prompt_version": "2",
+  "model": "llama3.2:3b",
+  "accuracy": 83.0,
+  "category_breakdown": {
+    "billing": {
+      "total": 28,
+      "correct": 24,
+      "accuracy": 85.71
+    },
+    "technical": {
+      "total": 26,
+      "correct": 19,
+      "accuracy": 73.08
+    },
+    "account": {
+      "total": 25,
+      "correct": 21,
+      "accuracy": 84.0
+    },
+    "general": {
+      "total": 21,
+      "correct": 19,
+      "accuracy": 90.48
+    }
+  },
+  "results": [
+    {
+      "id": "email_001",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged twice for a subscription.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Customer received duplicate charges",
+      "latency": 12.926,
+      "status": "passed"
+    },
+    {
+      "id": "email_002",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer requests a refund for an incorrect charge.",
+      "summary_similarity": 0.2,
+      "predicted_summary": "Customer disputes incorrect billing",
+      "latency": 2.134,
+      "status": "passed"
+    },
+    {
+      "id": "email_003",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer cannot complete payment.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Credit card payment is not going through.",
+      "latency": 2.339,
+      "status": "passed"
+    },
+    {
+      "id": "email_004",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer asks about subscription price increase.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Customer requests pricing change information",
+      "latency": 2.224,
+      "status": "passed"
+    },
+    {
+      "id": "email_005",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer reports an unknown charge.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Customer is unsure about a charge",
+      "latency": 2.279,
+      "status": "passed"
+    },
+    {
+      "id": "email_006",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports that the mobile app crashes.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "App crashes when opening mobile app.",
+      "latency": 2.293,
+      "status": "passed"
+    },
+    {
+      "id": "email_007",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports slow website performance.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Website performance issue.",
+      "latency": 2.043,
+      "status": "passed"
+    },
+    {
+      "id": "email_008",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer cannot upload files.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Customer experiencing upload issue",
+      "latency": 2.116,
+      "status": "passed"
+    },
+    {
+      "id": "email_009",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer encounters an application error.",
+      "summary_similarity": 0.111,
+      "predicted_summary": "Error submission in the app",
+      "latency": 2.244,
+      "status": "passed"
+    },
+    {
+      "id": "email_010",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports notification failure.",
+      "summary_similarity": 0.0,
+      "predicted_summary": "Application system issue",
+      "latency": 2.056,
+      "status": "passed"
+    },
+    {
+      "id": "email_011",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer forgot password and needs account access.",
+      "summary_similarity": 0.429,
+      "predicted_summary": "Customer forgot password.",
+      "latency": 2.007,
+      "status": "passed"
+    },
+    {
+      "id": "email_012",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot access their account.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Customer has login issues.",
+      "latency": 2.114,
+      "status": "passed"
+    },
+    {
+      "id": "email_013",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer wants to update account email.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Customer requests to change email address",
+      "latency": 2.332,
+      "status": "passed"
+    },
+    {
+      "id": "email_014",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer account is locked.",
+      "summary_similarity": 0.143,
+      "predicted_summary": "Account lock issue reported",
+      "latency": 2.149,
+      "status": "passed"
+    },
+    {
+      "id": "email_015",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer requests account deletion.",
+      "summary_similarity": 0.429,
+      "predicted_summary": "Customer requests to delete their account.",
+      "latency": 2.383,
+      "status": "passed"
+    },
+    {
+      "id": "email_016",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks about available features.",
+      "summary_similarity": 0.667,
+      "predicted_summary": "Customer asks about product features",
+      "latency": 2.273,
+      "status": "passed"
+    },
+    {
+      "id": "email_017",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests product information.",
+      "summary_similarity": 0.6,
+      "predicted_summary": "Customer seeks product information",
+      "latency": 2.202,
+      "status": "passed"
+    },
+    {
+      "id": "email_018",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks about discounts.",
+      "summary_similarity": 0.2,
+      "predicted_summary": "Customer has a general question about the product.",
+      "latency": 2.45,
+      "status": "passed"
+    },
+    {
+      "id": "email_019",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks how to contact support.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Customer seeks contact information for support",
+      "latency": 2.333,
+      "status": "passed"
+    },
+    {
+      "id": "email_020",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer provides positive feedback.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Customer complimenting on service quality",
+      "latency": 2.345,
+      "status": "passed"
+    },
+    {
+      "id": "email_021",
+      "expected_category": "general",
+      "predicted_category": "billing",
+      "expected_summary": "Customer provided an empty message.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Customer request refund for previous charge",
+      "latency": 2.163,
+      "status": "failed"
+    },
+    {
+      "id": "email_022",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests assistance without details.",
+      "summary_similarity": 0.286,
+      "predicted_summary": "Customer is seeking assistance",
+      "latency": 2.16,
+      "status": "passed"
+    },
+    {
+      "id": "email_023",
+      "expected_category": "technical",
+      "predicted_category": "general",
+      "expected_summary": "Customer reports a problem without additional details.",
+      "summary_similarity": 0.091,
+      "predicted_summary": "Customer is experiencing product issue",
+      "latency": 2.192,
+      "status": "failed"
+    },
+    {
+      "id": "email_024",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer paid but did not receive expected service.",
+      "summary_similarity": 0.0,
+      "predicted_summary": "Payment failed",
+      "latency": 2.029,
+      "status": "passed"
+    },
+    {
+      "id": "email_025",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports problems after an application update.",
+      "summary_similarity": 0.083,
+      "predicted_summary": "Error occurred after updating the app",
+      "latency": 2.328,
+      "status": "passed"
+    },
+    {
+      "id": "email_026",
+      "expected_category": "technical",
+      "predicted_category": "general",
+      "expected_summary": "Customer urgently reports a problem requiring assistance.",
+      "summary_similarity": 0.167,
+      "predicted_summary": "Customer expresses urgency about a product issue",
+      "latency": 2.325,
+      "status": "failed"
+    },
+    {
+      "id": "email_027",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer complains about a suspected incorrect charge.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Customer requests a refund.",
+      "latency": 2.071,
+      "status": "passed"
+    },
+    {
+      "id": "email_028",
+      "expected_category": "billing",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests a refund due to dissatisfaction.",
+      "summary_similarity": 0.5,
+      "predicted_summary": "Customer requests a product refund.",
+      "latency": 2.192,
+      "status": "failed"
+    },
+    {
+      "id": "email_029",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests contact from support.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Customer is seeking a personal interaction.",
+      "latency": 2.298,
+      "status": "passed"
+    },
+    {
+      "id": "email_030",
+      "expected_category": "general",
+      "predicted_category": "billing",
+      "expected_summary": "Customer asks about order status.",
+      "summary_similarity": 0.667,
+      "predicted_summary": "Customer inquires about order status",
+      "latency": 2.21,
+      "status": "failed"
+    },
+    {
+      "id": "email_031",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot access account after changing password.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Password reset issue persists",
+      "latency": 2.107,
+      "status": "passed"
+    },
+    {
+      "id": "email_032",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer reports possible unauthorized account access.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Account login issue",
+      "latency": 2.118,
+      "status": "passed"
+    },
+    {
+      "id": "email_033",
+      "expected_category": "account",
+      "predicted_category": "billing",
+      "expected_summary": "Customer wants to cancel their subscription.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Customer requests subscription cancellation",
+      "latency": 2.046,
+      "status": "failed"
+    },
+    {
+      "id": "email_034",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer wants to modify account information.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Customer requests to change username",
+      "latency": 2.137,
+      "status": "passed"
+    },
+    {
+      "id": "email_035",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports missing functionality after installation.",
+      "summary_similarity": 0.0,
+      "predicted_summary": "Feature is not functioning as expected",
+      "latency": 2.228,
+      "status": "passed"
+    },
+    {
+      "id": "email_036",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports a serious technical problem.",
+      "summary_similarity": 0.0,
+      "predicted_summary": "Product functionality issues have arisen",
+      "latency": 2.245,
+      "status": "passed"
+    },
+    {
+      "id": "email_037",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer asks about recurring subscription charges.",
+      "summary_similarity": 0.111,
+      "predicted_summary": "Customer queries monthly charge",
+      "latency": 2.102,
+      "status": "passed"
+    },
+    {
+      "id": "email_038",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks for pricing information.",
+      "summary_similarity": 0.571,
+      "predicted_summary": "Customer asks for clarification on pricing",
+      "latency": 2.237,
+      "status": "passed"
+    },
+    {
+      "id": "email_039",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests an explanation of the service.",
+      "summary_similarity": 0.083,
+      "predicted_summary": "Customer has a question about product",
+      "latency": 2.344,
+      "status": "passed"
+    },
+    {
+      "id": "email_040",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer message is unclear and contains invalid text.",
+      "summary_similarity": 0.2,
+      "predicted_summary": "Customer requests unclear request.",
+      "latency": 1.814,
+      "status": "passed"
+    },
+    {
+      "id": "email_041",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot login because they forgot their password.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Forgot account password",
+      "latency": 2.227,
+      "status": "passed"
+    },
+    {
+      "id": "email_042",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged twice for the same subscription.",
+      "summary_similarity": 0.091,
+      "predicted_summary": "Customer disputed duplicate payment.",
+      "latency": 2.217,
+      "status": "passed"
+    },
+    {
+      "id": "email_043",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports application failure after an update.",
+      "summary_similarity": 0.375,
+      "predicted_summary": "Application crashes after update",
+      "latency": 2.162,
+      "status": "passed"
+    },
+    {
+      "id": "email_044",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks how to contact support.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Customer seeks contact information for support",
+      "latency": 2.275,
+      "status": "passed"
+    },
+    {
+      "id": "email_045",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot access their account.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Customer experiences login issue",
+      "latency": 2.147,
+      "status": "passed"
+    },
+    {
+      "id": "email_046",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged twice for a subscription.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Customer disputes double payment",
+      "latency": 2.213,
+      "status": "passed"
+    },
+    {
+      "id": "email_047",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports that the application crashes when opened.",
+      "summary_similarity": 0.111,
+      "predicted_summary": "Application error",
+      "latency": 2.057,
+      "status": "passed"
+    },
+    {
+      "id": "email_048",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests information about the service.",
+      "summary_similarity": 0.5,
+      "predicted_summary": "Customer is asking about the service",
+      "latency": 2.279,
+      "status": "passed"
+    },
+    {
+      "id": "email_049",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot login to their account.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Customer experiencing login problems",
+      "latency": 2.132,
+      "status": "passed"
+    },
+    {
+      "id": "email_050",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged twice for a payment.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Payment repeated twice.",
+      "latency": 2.123,
+      "status": "passed"
+    },
+    {
+      "id": "email_051",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports that the application stopped working.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Application crashes",
+      "latency": 1.969,
+      "status": "passed"
+    },
+    {
+      "id": "email_052",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks about product pricing.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Customer is asking for product information",
+      "latency": 2.303,
+      "status": "passed"
+    },
+    {
+      "id": "email_053",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot login to their account.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Customer has login problem.",
+      "latency": 1.978,
+      "status": "passed"
+    },
+    {
+      "id": "email_054",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged twice.",
+      "summary_similarity": 0.143,
+      "predicted_summary": "Customer reports duplicate discount",
+      "latency": 1.826,
+      "status": "passed"
+    },
+    {
+      "id": "email_055",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports application failure after update.",
+      "summary_similarity": 0.375,
+      "predicted_summary": "Application not working after update.",
+      "latency": 1.874,
+      "status": "passed"
+    },
+    {
+      "id": "email_056",
+      "expected_category": "account",
+      "predicted_category": "general",
+      "expected_summary": "Customer cannot access their account.",
+      "summary_similarity": 0.143,
+      "predicted_summary": "Customer requests support",
+      "latency": 1.833,
+      "status": "failed"
+    },
+    {
+      "id": "email_057",
+      "expected_category": "account",
+      "predicted_category": "general",
+      "expected_summary": "Customer cannot login to their account.",
+      "summary_similarity": 0.091,
+      "predicted_summary": "Customer requests help with the invoice.",
+      "latency": 2.539,
+      "status": "failed"
+    },
+    {
+      "id": "email_058",
+      "expected_category": "billing",
+      "predicted_category": "general",
+      "expected_summary": "Customer was charged twice.",
+      "summary_similarity": 0.167,
+      "predicted_summary": "Customer requests support",
+      "latency": 2.196,
+      "status": "failed"
+    },
+    {
+      "id": "email_059",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports that the application does not work after an update.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Application crash after update",
+      "latency": 2.329,
+      "status": "passed"
+    },
+    {
+      "id": "email_060",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot access their account.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Customer experiencing login problems",
+      "latency": 2.181,
+      "status": "passed"
+    },
+    {
+      "id": "email_061",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged twice for their subscription.",
+      "summary_similarity": 0.3,
+      "predicted_summary": "Customer claims double charge for subscription",
+      "latency": 2.34,
+      "status": "passed"
+    },
+    {
+      "id": "email_062",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged but payment is not reflected.",
+      "summary_similarity": 0.182,
+      "predicted_summary": "Payment not showing after deduction",
+      "latency": 2.222,
+      "status": "passed"
+    },
+    {
+      "id": "email_063",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer requests a refund for an unwanted charge.",
+      "summary_similarity": 0.5,
+      "predicted_summary": "Customer requests a refund.",
+      "latency": 2.093,
+      "status": "passed"
+    },
+    {
+      "id": "email_064",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer asks about recurring monthly charges.",
+      "summary_similarity": 0.111,
+      "predicted_summary": "Customer requests a refund.",
+      "latency": 2.121,
+      "status": "passed"
+    },
+    {
+      "id": "email_065",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer cannot complete payment for a plan.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Payment issue",
+      "latency": 1.988,
+      "status": "passed"
+    },
+    {
+      "id": "email_066",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports that the application crashes when opened.",
+      "summary_similarity": 0.2,
+      "predicted_summary": "Customer reports app crash",
+      "latency": 1.724,
+      "status": "passed"
+    },
+    {
+      "id": "email_067",
+      "expected_category": "technical",
+      "predicted_category": "general",
+      "expected_summary": "Customer reports slow website performance.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Customer queries website loading speed",
+      "latency": 2.176,
+      "status": "failed"
+    },
+    {
+      "id": "email_068",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer cannot upload files because of an error.",
+      "summary_similarity": 0.3,
+      "predicted_summary": "Customer experiences upload file error",
+      "latency": 2.216,
+      "status": "passed"
+    },
+    {
+      "id": "email_069",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports problems after an update.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Technical issues after product update",
+      "latency": 2.189,
+      "status": "passed"
+    },
+    {
+      "id": "email_070",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports that the application may be unavailable.",
+      "summary_similarity": 0.0,
+      "predicted_summary": "Technical issues with app performance",
+      "latency": 2.217,
+      "status": "passed"
+    },
+    {
+      "id": "email_071",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot access account because they forgot password.",
+      "summary_similarity": 0.375,
+      "predicted_summary": "Customer forgot password",
+      "latency": 2.025,
+      "status": "passed"
+    },
+    {
+      "id": "email_072",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer reports login problem.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Customer experiencing login problems",
+      "latency": 2.102,
+      "status": "passed"
+    },
+    {
+      "id": "email_073",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer requests help unlocking their account.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Account lock issue",
+      "latency": 2.054,
+      "status": "passed"
+    },
+    {
+      "id": "email_074",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot update account email address.",
+      "summary_similarity": 0.3,
+      "predicted_summary": "Customer requests to change their email address",
+      "latency": 2.376,
+      "status": "passed"
+    },
+    {
+      "id": "email_075",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer requests account deletion.",
+      "summary_similarity": 1.0,
+      "predicted_summary": "Customer requests account deletion",
+      "latency": 2.134,
+      "status": "passed"
+    },
+    {
+      "id": "email_076",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks what the service is about.",
+      "summary_similarity": 0.625,
+      "predicted_summary": "Customer is unclear about the service",
+      "latency": 2.252,
+      "status": "passed"
+    },
+    {
+      "id": "email_077",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests pricing information.",
+      "summary_similarity": 0.5,
+      "predicted_summary": "Customer inquires about pricing information",
+      "latency": 2.271,
+      "status": "passed"
+    },
+    {
+      "id": "email_078",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer asks how to contact support.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Customer seeking contact information for support",
+      "latency": 2.337,
+      "status": "passed"
+    },
+    {
+      "id": "email_079",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer provides positive feedback.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Customer inquiry about the app",
+      "latency": 2.238,
+      "status": "passed"
+    },
+    {
+      "id": "email_080",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer has a general question.",
+      "summary_similarity": 0.667,
+      "predicted_summary": "Customer asks a general question",
+      "latency": 2.158,
+      "status": "passed"
+    },
+    {
+      "id": "email_081",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer paid for premium but cannot access purchased features.",
+      "summary_similarity": 0.455,
+      "predicted_summary": "Paid premium but no access to features",
+      "latency": 2.367,
+      "status": "passed"
+    },
+    {
+      "id": "email_082",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer disputes a charge for unused service.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Customer claims incorrect charge",
+      "latency": 2.22,
+      "status": "passed"
+    },
+    {
+      "id": "email_083",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer cannot access account after subscription change.",
+      "summary_similarity": 0.4,
+      "predicted_summary": "Customer experiencing login problem after subscription change.",
+      "latency": 2.468,
+      "status": "passed"
+    },
+    {
+      "id": "email_084",
+      "expected_category": "account",
+      "predicted_category": "billing",
+      "expected_summary": "Customer cannot reset password because reset email was not received.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Password reset email issue with charge",
+      "latency": 2.4,
+      "status": "failed"
+    },
+    {
+      "id": "email_085",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports service failure after upgrading.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Application failed after software update.",
+      "latency": 2.158,
+      "status": "passed"
+    },
+    {
+      "id": "email_086",
+      "expected_category": "technical",
+      "predicted_category": "technical",
+      "expected_summary": "Customer reports application crashes and requests assistance.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "App keeps crashing and customer requests a refund.",
+      "latency": 2.45,
+      "status": "passed"
+    },
+    {
+      "id": "email_087",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer reports account security issue and access problem.",
+      "summary_similarity": 0.444,
+      "predicted_summary": "Login and account access issue",
+      "latency": 2.229,
+      "status": "passed"
+    },
+    {
+      "id": "email_088",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer was charged despite payment failure message.",
+      "summary_similarity": 0.125,
+      "predicted_summary": "Payment error",
+      "latency": 1.984,
+      "status": "passed"
+    },
+    {
+      "id": "email_089",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer requests refund after dissatisfaction with service.",
+      "summary_similarity": 0.375,
+      "predicted_summary": "Customer requests a refund.",
+      "latency": 2.235,
+      "status": "passed"
+    },
+    {
+      "id": "email_090",
+      "expected_category": "technical",
+      "predicted_category": "general",
+      "expected_summary": "Customer reports unresolved service problems.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Customer expressing frustration and seeking help",
+      "latency": 2.295,
+      "status": "failed"
+    },
+    {
+      "id": "email_091",
+      "expected_category": "technical",
+      "predicted_category": "account",
+      "expected_summary": "Customer suspects a system problem affecting access.",
+      "summary_similarity": 0.0,
+      "predicted_summary": "Account issue unclear.",
+      "latency": 2.061,
+      "status": "failed"
+    },
+    {
+      "id": "email_092",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer questions repeated charges.",
+      "summary_similarity": 0.143,
+      "predicted_summary": "Customer claims incorrect charge",
+      "latency": 2.13,
+      "status": "passed"
+    },
+    {
+      "id": "email_093",
+      "expected_category": "billing",
+      "predicted_category": "account",
+      "expected_summary": "Customer needs help with account payment issue.",
+      "summary_similarity": 0.5,
+      "predicted_summary": "Customer reports an issue with their account payment",
+      "latency": 2.411,
+      "status": "failed"
+    },
+    {
+      "id": "email_094",
+      "expected_category": "technical",
+      "predicted_category": "general",
+      "expected_summary": "Customer reports problems after an update.",
+      "summary_similarity": 0.091,
+      "predicted_summary": "Customer has a product-related complaint.",
+      "latency": 2.298,
+      "status": "failed"
+    },
+    {
+      "id": "email_095",
+      "expected_category": "account",
+      "predicted_category": "account",
+      "expected_summary": "Customer needs account recovery assistance.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Customer has login or password issue",
+      "latency": 2.394,
+      "status": "passed"
+    },
+    {
+      "id": "email_096",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer asks about an increased bill.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Bill increased",
+      "latency": 1.991,
+      "status": "passed"
+    },
+    {
+      "id": "email_097",
+      "expected_category": "technical",
+      "predicted_category": "account",
+      "expected_summary": "Customer reports notification functionality issue.",
+      "summary_similarity": 0.25,
+      "predicted_summary": "Customer experiencing login related issue",
+      "latency": 2.171,
+      "status": "failed"
+    },
+    {
+      "id": "email_098",
+      "expected_category": "billing",
+      "predicted_category": "general",
+      "expected_summary": "Customer cannot access paid premium features.",
+      "summary_similarity": 0.222,
+      "predicted_summary": "Customer asks about feature access",
+      "latency": 2.255,
+      "status": "failed"
+    },
+    {
+      "id": "email_099",
+      "expected_category": "billing",
+      "predicted_category": "billing",
+      "expected_summary": "Customer has payment-related account problems after changing card.",
+      "summary_similarity": 0.1,
+      "predicted_summary": "Payment problem",
+      "latency": 2.086,
+      "status": "passed"
+    },
+    {
+      "id": "email_100",
+      "expected_category": "general",
+      "predicted_category": "general",
+      "expected_summary": "Customer requests general assistance.",
+      "summary_similarity": 0.333,
+      "predicted_summary": "Customer has unclear requests",
+      "latency": 2.264,
+      "status": "passed"
+    }
+  ]
+}

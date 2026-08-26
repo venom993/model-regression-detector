@@ -1,4 +1,5 @@
 # Testing GitHub Pull Request regression comments
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -11,7 +12,53 @@ from app.report import HTMLReport
 from app.slack import SlackNotifier
 from app.metrics import calculate_accuracy, category_breakdown
 from app.trends import TrendAnalyzer
+# --------------------------------------------------
+# COMMAND LINE ARGUMENTS
+# --------------------------------------------------
 
+parser = argparse.ArgumentParser(
+    description="LLM Regression Detection Pipeline"
+)
+
+parser.add_argument(
+    "--save-baseline",
+    type=str,
+    help="Save the current evaluation as a named baseline",
+)
+
+parser.add_argument(
+    "--baseline",
+    type=str,
+    help="Compare the current evaluation against a named baseline",
+)
+
+parser.add_argument(
+    "--list-baselines",
+    action="store_true",
+    help="List all available baselines",
+)
+
+args = parser.parse_args()
+# --------------------------------------------------
+# LIST BASELINES
+# --------------------------------------------------
+
+if args.list_baselines:
+
+    history_manager = HistoryManager()
+
+    baselines = history_manager.list_baselines()
+
+    if not baselines:
+        print("\nNo baselines found.")
+
+    else:
+        print("\nAvailable baselines:")
+
+        for baseline in baselines:
+            print(f" - {baseline}")
+
+    sys.exit(0)
 evaluator = Evaluator()
 
 results = evaluator.run()
@@ -69,6 +116,16 @@ print(breakdown)
 print("\nRegression Report")
 print("=================")
 
+# --------------------------------------------------
+# COMPARISON LABEL
+# --------------------------------------------------
+
+if args.baseline:
+    comparison_label = "Baseline"
+else:
+    comparison_label = "Previous"
+
+
 if comparison["status"] == "FIRST_RUN":
 
     print("Status            : FIRST_RUN")
@@ -80,31 +137,32 @@ else:
     print("===================")
 
     print(
-    f"Previous Accuracy : "
-    f"{comparison['previous_accuracy']}"
-)
+        f"{comparison_label} Accuracy : "
+        f"{comparison['previous_accuracy']}"
+    )
 
     print(
-    f"Current Accuracy  : "
-    f"{comparison['current_accuracy']}"
-)
+        f"Current Accuracy  : "
+        f"{comparison['current_accuracy']}"
+    )
 
     print(
-    f"Delta             : "
-    f"{comparison['delta']}%"
-)
+        f"Delta             : "
+        f"{comparison['delta']}%"
+    )
 
     print(
-    f"Status            : "
-    f"{comparison['status']}"
-)
+        f"Status            : "
+        f"{comparison['status']}"
+    )
+
 
 
 print("\nPerformance Regression")
 print("======================")
 
 print(
-    f"Previous Avg Latency : "
+    f"{comparison_label} Avg Latency : "
     f"{comparison['previous_average_latency']} seconds"
 )
 
@@ -135,12 +193,14 @@ current_similarity = comparison.get(
 
 if previous_similarity is None:
 
-    print("Previous Avg Similarity : N/A")
+    print(
+        f"{comparison_label} Avg Similarity : N/A"
+    )
 
 else:
 
     print(
-        f"Previous Avg Similarity : "
+        f"{comparison_label} Avg Similarity : "
         f"{previous_similarity}"
     )
 

@@ -22,6 +22,7 @@ class RegressionDetector:
             return json.load(f)
 
     def calculate_average_latency(self, results):
+
         latencies = [
             item["latency"]
             for item in results
@@ -32,7 +33,11 @@ class RegressionDetector:
         if not latencies:
             return 0
 
-        return round(sum(latencies) / len(latencies), 3)
+        return round(
+            sum(latencies) / len(latencies),
+            3
+        )
+
     def calculate_average_similarity(self, results):
 
         similarities = [
@@ -49,33 +54,58 @@ class RegressionDetector:
             sum(similarities) / len(similarities),
             3
         )
-    def compare(self, current_results, current_accuracy):
 
-        previous = self.previous_run()
+    def compare(
+        self,
+        current_results,
+        current_accuracy,
+        reference=None,
+        baseline_name=None,
+    ):
 
-        current_average_latency = self.calculate_average_latency(
-            current_results
+        # Use the provided baseline/reference.
+        if reference is not None:
+            previous = reference
+
+        # Otherwise use the previous evaluation.
+        else:
+            previous = self.previous_run()
+
+        current_average_latency = (
+            self.calculate_average_latency(
+                current_results
+            )
         )
+
         current_average_similarity = (
-    self.calculate_average_similarity(
-        current_results
-    )
-)
+            self.calculate_average_similarity(
+                current_results
+            )
+        )
+
+        # ============================
+        # FIRST RUN
+        # ============================
 
         if previous is None:
+
             return {
                 "status": "FIRST_RUN",
+                "baseline_name": baseline_name,
+
                 "previous_accuracy": None,
                 "current_accuracy": current_accuracy,
                 "delta": 0,
 
                 "previous_average_latency": None,
-                "current_average_latency": current_average_latency,
+                "current_average_latency":
+                    current_average_latency,
                 "latency_delta": 0,
                 "latency_status": "FIRST_RUN",
 
                 "previous_average_similarity": None,
-                "current_average_similarity": current_average_similarity,
+                "current_average_similarity":
+                    current_average_similarity,
                 "similarity_delta": 0,
                 "similarity_status": "FIRST_RUN",
 
@@ -120,7 +150,7 @@ class RegressionDetector:
             latency_delta = 0
 
         # ============================
-        # SEMANTIC SIMILARITY COMPARISON
+        # SEMANTIC SIMILARITY
         # ============================
 
         previous_average_similarity = (
@@ -171,7 +201,7 @@ class RegressionDetector:
             latency_status = "PASS"
 
         # ============================
-        # SEMANTIC SIMILARITY STATUS
+        # SIMILARITY STATUS
         # ============================
 
         if similarity_delta <= -15:
@@ -181,7 +211,7 @@ class RegressionDetector:
             similarity_status = "WARNING"
 
         else:
-            similarity_status = "PASS"    
+            similarity_status = "PASS"
 
         # ============================
         # CASE REGRESSIONS
@@ -222,7 +252,13 @@ class RegressionDetector:
             elif not old_pass and new_pass:
                 improvements.append(item)
 
+        # ============================
+        # FINAL COMPARISON RESULT
+        # ============================
+
         return {
+            "baseline_name": baseline_name,
+
             "previous_accuracy": previous_accuracy,
             "current_accuracy": current_accuracy,
             "delta": delta,
