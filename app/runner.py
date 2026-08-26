@@ -80,12 +80,34 @@ breakdown = category_breakdown(results)
 
 detector = RegressionDetector()
 
-# IMPORTANT:
-# Compare BEFORE saving the current run.
+reference = None
+baseline_name = None
+
+if args.baseline:
+    history = HistoryManager()
+
+    reference = history.load_baseline(args.baseline)
+
+    if reference is None:
+        print(
+            f"\nBaseline '{args.baseline}' not found."
+        )
+        sys.exit(1)
+
+    baseline_name = args.baseline
+
+    print(
+        f"\nComparing against baseline: "
+        f"{baseline_name}"
+    )
+
 comparison = detector.compare(
-    results,
-    accuracy
+    current_results=results,
+    current_accuracy=accuracy,
+    reference=reference,
+    baseline_name=baseline_name,
 )
+
 Path("reports").mkdir(exist_ok=True)
 
 with open(
@@ -129,7 +151,7 @@ else:
 if comparison["status"] == "FIRST_RUN":
 
     print("Status            : FIRST_RUN")
-    print("No previous evaluation found.")
+    print("No comparison reference found.")
 
 else:
 

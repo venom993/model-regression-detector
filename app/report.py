@@ -9,6 +9,10 @@ class HTMLReport:
         self.report_dir = Path("reports")
         self.report_dir.mkdir(exist_ok=True)
 
+    # ==========================================
+    # ACCURACY CHART
+    # ==========================================
+
     def create_accuracy_chart(self, history):
 
         if len(history) < 2:
@@ -46,6 +50,10 @@ class HTMLReport:
         plt.close()
 
         return chart.name
+
+    # ==========================================
+    # LATENCY CHART
+    # ==========================================
 
     def create_latency_chart(self, history):
 
@@ -108,6 +116,10 @@ class HTMLReport:
 
         return chart.name
 
+    # ==========================================
+    # GENERATE HTML REPORT
+    # ==========================================
+
     def generate(
         self,
         comparison,
@@ -125,6 +137,23 @@ class HTMLReport:
             history
         )
 
+        # ==========================================
+        # BASELINE / PREVIOUS RUN LABEL
+        # ==========================================
+
+        baseline_name = comparison.get("baseline_name")
+
+        if baseline_name:
+            comparison_label = (
+                f"Baseline ({baseline_name})"
+            )
+        else:
+            comparison_label = "Previous Run"
+
+        # ==========================================
+        # REGRESSIONS
+        # ==========================================
+
         regressions = ""
 
         for item in comparison["regressions"]:
@@ -138,6 +167,7 @@ class HTMLReport:
             """
 
         if not regressions:
+
             regressions = """
             <tr>
                 <td colspan="3">
@@ -145,6 +175,10 @@ class HTMLReport:
                 </td>
             </tr>
             """
+
+        # ==========================================
+        # IMPROVEMENTS
+        # ==========================================
 
         improvements = ""
 
@@ -159,6 +193,7 @@ class HTMLReport:
             """
 
         if not improvements:
+
             improvements = """
             <tr>
                 <td colspan="3">
@@ -166,6 +201,10 @@ class HTMLReport:
                 </td>
             </tr>
             """
+
+        # ==========================================
+        # CATEGORY BREAKDOWN
+        # ==========================================
 
         category_rows = ""
 
@@ -180,40 +219,9 @@ class HTMLReport:
             </tr>
             """
 
-        latency_section = ""
-
-        if "previous_latency" in comparison:
-
-            latency_section = f"""
-
-            <h2>Performance Regression</h2>
-
-            <ul>
-
-                <li>
-                    Previous Average Latency:
-                    {comparison["previous_latency"]} seconds
-                </li>
-
-                <li>
-                    Current Average Latency:
-                    {comparison["current_latency"]} seconds
-                </li>
-
-                <li>
-                    Latency Delta:
-                    {comparison["latency_delta"]}%
-                </li>
-
-                <li>
-                    Status:
-                    <span class="{comparison["latency_status"].lower()}">
-                        {comparison["latency_status"]}
-                    </span>
-                </li>
-
-            </ul>
-            """
+        # ==========================================
+        # ACCURACY CHART
+        # ==========================================
 
         accuracy_chart_section = ""
 
@@ -229,6 +237,10 @@ class HTMLReport:
             >
             """
 
+        # ==========================================
+        # LATENCY CHART
+        # ==========================================
+
         latency_chart_section = ""
 
         if latency_chart:
@@ -242,36 +254,61 @@ class HTMLReport:
                 alt="Latency trend chart"
             >
             """
-            similarity_section = f"""
 
-<h2>Semantic Similarity Regression</h2>
+        # ==========================================
+        # SEMANTIC SIMILARITY
+        # ==========================================
 
-<ul>
+        similarity_section = f"""
 
-<li>
-Previous Avg Similarity:
-{comparison.get("previous_average_similarity", "N/A")}
-</li>
+        <h2>Semantic Similarity Regression</h2>
 
-<li>
-Current Avg Similarity:
-{comparison.get("current_average_similarity", "N/A")}
-</li>
+        <ul>
 
-<li>
-Similarity Delta:
-{comparison.get("similarity_delta", "N/A")}%
-</li>
+            <li>
+                {comparison_label} Avg Similarity:
+                {comparison.get(
+                    "previous_average_similarity",
+                    "N/A"
+                )}
+            </li>
 
-<li>
-Status:
-<span class="{comparison.get("similarity_status", "PASS").lower()}">
-{comparison.get("similarity_status", "PASS")}
-</span>
-</li>
+            <li>
+                Current Avg Similarity:
+                {comparison.get(
+                    "current_average_similarity",
+                    "N/A"
+                )}
+            </li>
 
-</ul>
-"""
+            <li>
+                Similarity Delta:
+                {comparison.get(
+                    "similarity_delta",
+                    "N/A"
+                )}%
+            </li>
+
+            <li>
+                Status:
+                <span class="{comparison.get(
+                    "similarity_status",
+                    "PASS"
+                ).lower()}">
+                    {comparison.get(
+                        "similarity_status",
+                        "PASS"
+                    )}
+                </span>
+            </li>
+
+        </ul>
+        """
+
+        # ==========================================
+        # GENERATE HTML
+        # ==========================================
+
         html = f"""
 <!DOCTYPE html>
 
@@ -358,74 +395,97 @@ th {{
 
 <p><b>Model:</b> {model}</p>
 
+<p>
+    <b>Comparison Target:</b>
+    {comparison_label}
+</p>
+
 
 <h2>Accuracy Regression</h2>
 
 <ul>
 
-<li>
-Previous Accuracy:
-{comparison["previous_accuracy"]}%
-</li>
+    <li>
+        {comparison_label} Accuracy:
+        {comparison["previous_accuracy"]}%
+    </li>
 
-<li>
-Current Accuracy:
-{comparison["current_accuracy"]}%
-</li>
+    <li>
+        Current Accuracy:
+        {comparison["current_accuracy"]}%
+    </li>
 
-<li>
-Delta:
-{comparison["delta"]}%
-</li>
+    <li>
+        Delta:
+        {comparison["delta"]}%
+    </li>
 
-<li>
-Status:
-<span class="{comparison["status"].lower()}">
-{comparison["status"]}
-</span>
-</li>
+    <li>
+        Status:
+        <span class="{comparison["status"].lower()}">
+            {comparison["status"]}
+        </span>
+    </li>
 
 </ul>
 
 
-{latency_section}
 <h2>Performance Regression</h2>
 
 <ul>
 
-<li>
-Previous Avg Latency:
-{comparison.get("previous_average_latency", "N/A")} seconds
-</li>
+    <li>
+        {comparison_label} Avg Latency:
+        {comparison.get(
+            "previous_average_latency",
+            "N/A"
+        )} seconds
+    </li>
 
-<li>
-Current Avg Latency:
-{comparison.get("current_average_latency", "N/A")} seconds
-</li>
+    <li>
+        Current Avg Latency:
+        {comparison.get(
+            "current_average_latency",
+            "N/A"
+        )} seconds
+    </li>
 
-<li>
-Latency Delta:
-{comparison.get("latency_delta", "N/A")}%
-</li>
+    <li>
+        Latency Delta:
+        {comparison.get(
+            "latency_delta",
+            "N/A"
+        )}%
+    </li>
 
-<li>
-Status:
-<span class="{comparison.get("latency_status", "PASS").lower()}">
-{comparison.get("latency_status", "PASS")}
-</span>
-</li>
+    <li>
+        Status:
+        <span class="{comparison.get(
+            "latency_status",
+            "PASS"
+        ).lower()}">
+            {comparison.get(
+                "latency_status",
+                "PASS"
+            )}
+        </span>
+    </li>
 
 </ul>
+
+
 {similarity_section}
+
+
 <h2>Category Accuracy</h2>
 
 <table>
 
 <tr>
-<th>Category</th>
-<th>Total</th>
-<th>Correct</th>
-<th>Accuracy</th>
+    <th>Category</th>
+    <th>Total</th>
+    <th>Correct</th>
+    <th>Accuracy</th>
 </tr>
 
 {category_rows}
@@ -440,15 +500,15 @@ Status:
 
 
 <h2>
-Regressions ({len(comparison["regressions"])})
+    Regressions ({len(comparison["regressions"])})
 </h2>
 
 <table>
 
 <tr>
-<th>Email</th>
-<th>Expected</th>
-<th>Predicted</th>
+    <th>Email</th>
+    <th>Expected</th>
+    <th>Predicted</th>
 </tr>
 
 {regressions}
@@ -457,15 +517,15 @@ Regressions ({len(comparison["regressions"])})
 
 
 <h2>
-Improvements ({len(comparison["improvements"])})
+    Improvements ({len(comparison["improvements"])})
 </h2>
 
 <table>
 
 <tr>
-<th>Email</th>
-<th>Expected</th>
-<th>Predicted</th>
+    <th>Email</th>
+    <th>Expected</th>
+    <th>Predicted</th>
 </tr>
 
 {improvements}
