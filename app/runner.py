@@ -474,3 +474,4 @@ if (
     sys.exit(1)
 
 print("\nCI regression test run")
+# Test automatic GitHub PR regression comment
