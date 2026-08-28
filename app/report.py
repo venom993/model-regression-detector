@@ -34,19 +34,14 @@ class HTMLReport:
         )
 
         plt.title("Accuracy Over Time")
-
         plt.xlabel("Evaluation Run")
-
         plt.ylabel("Accuracy (%)")
-
         plt.grid(True)
-
         plt.tight_layout()
 
         chart = self.report_dir / "accuracy.png"
 
         plt.savefig(chart)
-
         plt.close()
 
         return chart.name
@@ -99,16 +94,71 @@ class HTMLReport:
         )
 
         plt.title("Average Latency Over Time")
+        plt.xlabel("Evaluation Run")
+        plt.ylabel("Average Latency (seconds)")
+        plt.grid(True)
+        plt.tight_layout()
+
+        chart = self.report_dir / "latency.png"
+
+        plt.savefig(chart)
+        plt.close()
+
+        return chart.name
+
+    # ==========================================
+    # DEEPEVAL RELEVANCY CHART
+    # ==========================================
+
+    def create_deepeval_chart(self, history):
+
+        if len(history) < 2:
+            return None
+
+        runs = []
+        relevancy_scores = []
+
+        for index, run in enumerate(history, start=1):
+
+            score = run.get(
+                "average_deepeval_relevancy"
+            )
+
+            if score is not None:
+
+                runs.append(index)
+
+                relevancy_scores.append(score)
+
+        if not relevancy_scores:
+            return None
+
+        plt.figure(figsize=(10, 5))
+
+        plt.plot(
+            runs,
+            relevancy_scores,
+            marker="o"
+        )
+
+        plt.title(
+            "Average DeepEval Relevancy Over Time"
+        )
 
         plt.xlabel("Evaluation Run")
 
-        plt.ylabel("Average Latency (seconds)")
+        plt.ylabel(
+            "Average DeepEval Relevancy"
+        )
 
         plt.grid(True)
 
         plt.tight_layout()
 
-        chart = self.report_dir / "latency.png"
+        chart = (
+            self.report_dir
+            / "deepeval_relevancy.png"
+        )
 
         plt.savefig(chart)
 
@@ -129,6 +179,10 @@ class HTMLReport:
         history,
     ):
 
+        # ==========================================
+        # CREATE CHARTS
+        # ==========================================
+
         accuracy_chart = self.create_accuracy_chart(
             history
         )
@@ -137,17 +191,26 @@ class HTMLReport:
             history
         )
 
+        deepeval_chart = self.create_deepeval_chart(
+            history
+        )
+
         # ==========================================
         # BASELINE / PREVIOUS RUN LABEL
         # ==========================================
 
-        baseline_name = comparison.get("baseline_name")
+        baseline_name = comparison.get(
+            "baseline_name"
+        )
 
         if baseline_name:
+
             comparison_label = (
                 f"Baseline ({baseline_name})"
             )
+
         else:
+
             comparison_label = "Previous Run"
 
         # ==========================================
@@ -220,7 +283,7 @@ class HTMLReport:
             """
 
         # ==========================================
-        # ACCURACY CHART
+        # ACCURACY CHART SECTION
         # ==========================================
 
         accuracy_chart_section = ""
@@ -238,7 +301,7 @@ class HTMLReport:
             """
 
         # ==========================================
-        # LATENCY CHART
+        # LATENCY CHART SECTION
         # ==========================================
 
         latency_chart_section = ""
@@ -252,6 +315,24 @@ class HTMLReport:
                 src="{latency_chart}"
                 class="chart"
                 alt="Latency trend chart"
+            >
+            """
+
+        # ==========================================
+        # DEEPEVAL CHART SECTION
+        # ==========================================
+
+        deepeval_chart_section = ""
+
+        if deepeval_chart:
+
+            deepeval_chart_section = f"""
+            <h2>🧪 DeepEval Relevancy Trend</h2>
+
+            <img
+                src="{deepeval_chart}"
+                class="chart"
+                alt="DeepEval relevancy trend chart"
             >
             """
 
@@ -295,10 +376,69 @@ class HTMLReport:
                     "similarity_status",
                     "PASS"
                 ).lower()}">
+
                     {comparison.get(
                         "similarity_status",
                         "PASS"
                     )}
+
+                </span>
+            </li>
+
+        </ul>
+        """
+
+        # ==========================================
+        # DEEPEVAL RELEVANCY
+        # ==========================================
+
+        deepeval_section = f"""
+
+        <h2>🧪 DeepEval Relevancy</h2>
+
+        <ul>
+
+            <li>
+                {comparison_label}
+                Avg DeepEval Relevancy:
+
+                {comparison.get(
+                    "previous_average_deepeval_relevancy",
+                    "N/A"
+                )}
+            </li>
+
+            <li>
+                Current Avg DeepEval Relevancy:
+
+                {comparison.get(
+                    "current_average_deepeval_relevancy",
+                    "N/A"
+                )}
+            </li>
+
+            <li>
+                DeepEval Delta:
+
+                {comparison.get(
+                    "deepeval_delta",
+                    "N/A"
+                )}%
+            </li>
+
+            <li>
+                Status:
+
+                <span class="{comparison.get(
+                    "deepeval_status",
+                    "PASS"
+                ).lower()}">
+
+                    {comparison.get(
+                        "deepeval_status",
+                        "PASS"
+                    )}
+
                 </span>
             </li>
 
@@ -389,11 +529,17 @@ th {{
 
 <h1>🤖 LLM Regression Report</h1>
 
-<p><b>Date:</b> {datetime.now()}</p>
+<p>
+    <b>Date:</b> {datetime.now()}
+</p>
 
-<p><b>Prompt Version:</b> {prompt_version}</p>
+<p>
+    <b>Prompt Version:</b> {prompt_version}
+</p>
 
-<p><b>Model:</b> {model}</p>
+<p>
+    <b>Model:</b> {model}
+</p>
 
 <p>
     <b>Comparison Target:</b>
@@ -422,8 +568,11 @@ th {{
 
     <li>
         Status:
+
         <span class="{comparison["status"].lower()}">
+
             {comparison["status"]}
+
         </span>
     </li>
 
@@ -436,22 +585,29 @@ th {{
 
     <li>
         {comparison_label} Avg Latency:
+
         {comparison.get(
             "previous_average_latency",
             "N/A"
-        )} seconds
+        )}
+
+        seconds
     </li>
 
     <li>
         Current Avg Latency:
+
         {comparison.get(
             "current_average_latency",
             "N/A"
-        )} seconds
+        )}
+
+        seconds
     </li>
 
     <li>
         Latency Delta:
+
         {comparison.get(
             "latency_delta",
             "N/A"
@@ -460,14 +616,17 @@ th {{
 
     <li>
         Status:
+
         <span class="{comparison.get(
             "latency_status",
             "PASS"
         ).lower()}">
+
             {comparison.get(
                 "latency_status",
                 "PASS"
             )}
+
         </span>
     </li>
 
@@ -477,15 +636,20 @@ th {{
 {similarity_section}
 
 
+{deepeval_section}
+
+
 <h2>Category Accuracy</h2>
 
 <table>
 
 <tr>
+
     <th>Category</th>
     <th>Total</th>
     <th>Correct</th>
     <th>Accuracy</th>
+
 </tr>
 
 {category_rows}
@@ -499,6 +663,9 @@ th {{
 {latency_chart_section}
 
 
+{deepeval_chart_section}
+
+
 <h2>
     Regressions ({len(comparison["regressions"])})
 </h2>
@@ -506,9 +673,11 @@ th {{
 <table>
 
 <tr>
+
     <th>Email</th>
     <th>Expected</th>
     <th>Predicted</th>
+
 </tr>
 
 {regressions}
@@ -523,9 +692,11 @@ th {{
 <table>
 
 <tr>
+
     <th>Email</th>
     <th>Expected</th>
     <th>Predicted</th>
+
 </tr>
 
 {improvements}
@@ -538,6 +709,10 @@ th {{
 
 </html>
 """
+
+        # ==========================================
+        # SAVE REPORT
+        # ==========================================
 
         output = (
             self.report_dir

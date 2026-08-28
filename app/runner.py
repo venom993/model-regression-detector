@@ -73,6 +73,36 @@ for i, result in enumerate(results):
 
 accuracy = calculate_accuracy(results)
 breakdown = category_breakdown(results)
+# --------------------------------------------------
+# DEEPEVAL AGGREGATE METRIC
+# --------------------------------------------------
+
+deepeval_scores = [
+
+    result.get("deepeval_relevancy")
+
+    for result in results
+
+    if result.get("deepeval_relevancy") is not None
+    and result.get("status") != "error"
+
+]
+
+
+if deepeval_scores:
+
+    average_deepeval_relevancy = round(
+
+        sum(deepeval_scores)
+        / len(deepeval_scores),
+
+        3
+
+    )
+
+else:
+
+    average_deepeval_relevancy = None
 
 # --------------------------------------------------
 # REGRESSION CHECK
@@ -131,6 +161,14 @@ print("Evaluation Results")
 print("===================")
 
 print(f"Accuracy: {accuracy}%")
+
+print(
+
+    "Average DeepEval Relevancy: "
+
+    f"{average_deepeval_relevancy}"
+
+)
 
 print("\nCategory Breakdown:")
 print(breakdown)
@@ -240,6 +278,48 @@ print(
     f"Status                  : "
     f"{comparison['similarity_status']}"
 )
+# --------------------------------------------------
+# DEEPEVAL RELEVANCY
+# --------------------------------------------------
+
+print("\nDeepEval Relevancy")
+print("==================")
+
+previous_deepeval = comparison.get(
+    "previous_average_deepeval_relevancy"
+)
+
+current_deepeval = comparison.get(
+    "current_average_deepeval_relevancy"
+)
+
+if previous_deepeval is None:
+
+    print(
+        f"{comparison_label} Avg Relevancy : N/A"
+    )
+
+else:
+
+    print(
+        f"{comparison_label} Avg Relevancy : "
+        f"{previous_deepeval}"
+    )
+
+print(
+    f"Current Avg Relevancy  : "
+    f"{current_deepeval}"
+)
+
+print(
+    f"DeepEval Delta         : "
+    f"{comparison['deepeval_delta']}%"
+)
+
+print(
+    f"Status                 : "
+    f"{comparison['deepeval_status']}"
+)
 
 print(
         "\nRegressions:",
@@ -264,7 +344,28 @@ for case in comparison["improvements"]:
             f"({case['expected_category']})"
         )
 
+# --------------------------------------------------
+# SAVE NAMED BASELINE
+# --------------------------------------------------
 
+if args.save_baseline:
+
+    history = HistoryManager()
+
+    baseline_file = history.save_baseline(
+        name=args.save_baseline,
+        prompt_version=evaluator.prompt.version,
+        model=OLLAMA_MODEL,
+        accuracy=accuracy,
+        category_breakdown=breakdown,
+        results=results,
+        average_deepeval_relevancy=
+            average_deepeval_relevancy,
+    )
+
+    print(
+        f"\nBaseline saved: {baseline_file}"
+    )
 # --------------------------------------------------
 # SAVE CURRENT RUN AFTER COMPARISON
 # --------------------------------------------------
@@ -277,6 +378,7 @@ history_file = history.save_run(
     accuracy=accuracy,
     category_breakdown=breakdown,
     results=results,
+    average_deepeval_relevancy=average_deepeval_relevancy
 )
 
 print(f"\nHistory saved: {history_file}")
@@ -366,6 +468,7 @@ if (
     comparison["status"] == "CRITICAL"
     or comparison["latency_status"] == "CRITICAL"
     or comparison["similarity_status"] == "CRITICAL"
+    or comparison["deepeval_status"] == "CRITICAL"
 ):
     print("\nCritical regression detected.")
     sys.exit(1)

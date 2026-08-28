@@ -32,7 +32,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-            # ==============================================
+      # ==============================================
       # CHECK PYTHON
       # ==============================================
       - name: Check Python
@@ -60,7 +60,7 @@ jobs:
           OLLAMA_HOST: ${{ secrets.OLLAMA_HOST }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          python -m app.runner --baseline baseline_v1
+          python -m app.runner --baseline baseline_v2
 
       # ==============================================
       # CREATE OR UPDATE PULL REQUEST COMMENT
@@ -110,6 +110,14 @@ jobs:
 
             const similarityDelta =
               comparison.similarity_delta ?? 'N/A';
+            const previousDeepEval =
+              comparison.previous_average_deepeval_relevancy ?? 'N/A';
+            const currentDeepEval =
+              comparison.current_average_deepeval_relevancy ?? 'N/A';
+            const deepEvalDelta =
+              comparison.deepeval_delta ?? 'N/A';
+            const deepEvalStatus =
+              comparison.deepeval_status ?? 'N/A';
 
             const regressions =
               comparison.regressions?.length ?? 0;
@@ -117,12 +125,18 @@ jobs:
             const improvements =
               comparison.improvements?.length ?? 0;
 
+            const statuses = [
+              comparison.status,
+              comparison.latency_status,
+              comparison.similarity_status,
+              comparison.deepeval_status
+            ];
             const overallStatus =
-              comparison.status === 'CRITICAL' ||
-              comparison.latency_status === 'CRITICAL' ||
-              comparison.similarity_status === 'CRITICAL'
-                ? '🔴 CRITICAL'
-                : '🟢 PASSED';
+              statuses.includes('CRITICAL')
+              ? '🔴 CRITICAL'
+              : statuses.includes('WARNING')
+              ? '🟡 WARNING'
+              : '🟢 PASSED';
 
             // Unique hidden identifier used to find
             // the existing GitHub comment.
@@ -172,6 +186,15 @@ jobs:
 
             ---
 
+            ### 🧪 Deep Evaluation
+            | Metric | Value |
+            |---|---|
+            | ${comparisonLabel} Deep Eval | ${previousDeepEval} |
+            | Current Avg DeepEval Relevancy | ${currentDeepEval} |
+            | Delta | ${deepEvalDelta}% |
+            | Status | **${deepEvalStatus}** |  
+
+            ---
             ### 🔍 Case Changes
 
             🔴 **Regressions:** ${regressions}

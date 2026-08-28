@@ -19,6 +19,7 @@ class HistoryManager:
         accuracy,
         category_breakdown,
         results,
+        average_deepeval_relevancy=None,
     ):
 
         timestamp = datetime.now().strftime(
@@ -34,6 +35,7 @@ class HistoryManager:
             "accuracy": accuracy,
             "category_breakdown": category_breakdown,
             "results": results,
+            "average_deepeval_relevancy": average_deepeval_relevancy,
         }
 
         with open(filename, "w", encoding="utf-8") as f:
@@ -73,6 +75,7 @@ class HistoryManager:
         accuracy,
         category_breakdown,
         results,
+        average_deepeval_relevancy=None
     ):
 
         filename = self.baseline_dir / f"{name}.json"
@@ -87,6 +90,7 @@ class HistoryManager:
             "accuracy": accuracy,
             "category_breakdown": category_breakdown,
             "results": results,
+            "average_deepeval_relevancy": average_deepeval_relevancy,
         }
 
         with open(filename, "w", encoding="utf-8") as f:

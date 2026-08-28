@@ -55,7 +55,19 @@ class SlackNotifier:
 
             f"Status: "
             f"*{comparison.get('similarity_status', 'N/A')}*\n\n"
+            "🧪 *DeepEval Relevancy*\n"
 
+            f"Previous Avg Relevancy: "
+            f"{comparison.get('previous_average_deepeval_relevancy', 'N/A')}\n"
+
+            f"Current Avg Relevancy: "
+            f"{comparison.get('current_average_deepeval_relevancy', 'N/A')}\n"
+
+            f"DeepEval Delta: "
+            f"{comparison.get('deepeval_delta', 'N/A')}%\n"
+
+            f"Status: "
+            f"*{comparison.get('deepeval_status', 'N/A')}*\n\n"
             "🔄 *Case Changes*\n"
             f"🔴 Regressions: "
             f"{len(comparison.get('regressions', []))}\n"

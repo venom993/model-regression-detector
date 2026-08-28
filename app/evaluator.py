@@ -4,10 +4,10 @@ from app.classifier import EmailClassifier
 from app.prompt_loader import PromptLoader
 from app.dataset_loader import DatasetLoader
 from app.semantic import SemanticSimilarity
+from app.deepeval_evaluator import DeepEvalEvaluator
 
 
 class Evaluator:
-
 
     def __init__(self):
 
@@ -20,8 +20,10 @@ class Evaluator:
         )
 
         self.dataset_loader = DatasetLoader()
+
         self.semantic_similarity = SemanticSimilarity()
 
+        self.deepeval = DeepEvalEvaluator()
 
     def run(self):
 
@@ -29,16 +31,13 @@ class Evaluator:
 
         results = []
 
-
         for item in dataset:
 
             print(
                 f"Testing {item['id']}..."
             )
 
-
             start = time.time()
-
 
             try:
 
@@ -46,22 +45,33 @@ class Evaluator:
                     item["input"]
                 )
 
-
                 latency = round(
                     time.time() - start,
                     3
                 )
-                summary_similarity = (
-    self.semantic_similarity.calculate(
-        item["expected_output"]["summary"],
-        prediction.summary
-    )
-)
 
+                summary_similarity = (
+                    self.semantic_similarity.calculate(
+                        item["expected_output"]["summary"],
+                        prediction.summary
+                    )
+                )
+
+                # ------------------------------------------
+                # DeepEval Answer Relevancy
+                # ------------------------------------------
+
+                deepeval_result = (
+                    self.deepeval.evaluate_result(
+                        item["input"],
+                        prediction.summary
+                    )
+                )
 
                 results.append({
 
-                    "id": item["id"],
+                    "id":
+                    item["id"],
 
                     "expected_category":
                     item["expected_output"]["category"],
@@ -78,6 +88,15 @@ class Evaluator:
                     "predicted_summary":
                     prediction.summary,
 
+                    "deepeval_relevancy":
+                    deepeval_result["score"],
+
+                    "deepeval_reason":
+                    deepeval_result["reason"],
+
+                    "deepeval_success":
+                    deepeval_result["success"],
+
                     "latency":
                     latency,
 
@@ -90,20 +109,19 @@ class Evaluator:
 
                 })
 
-
             except Exception as e:
-
 
                 results.append({
 
-                    "id": item["id"],
+                    "id":
+                    item["id"],
 
-                    "error": str(e),
+                    "error":
+                    str(e),
 
                     "status":
                     "error"
 
                 })
-
 
         return results

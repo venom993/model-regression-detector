@@ -22,7 +22,11 @@ st.set_page_config(
 # ==================================================
 
 HISTORY_DIR = Path("history")
+REPORTS_DIR = Path("reports")
 
+COMPARISON_FILE = (
+    REPORTS_DIR / "regression_comparison.json"
+)
 
 
 def load_history():
@@ -47,6 +51,30 @@ def load_history():
 
 
 history = load_history()
+def load_comparison():
+
+    if not COMPARISON_FILE.exists():
+        return None
+
+    try:
+
+        with open(
+            COMPARISON_FILE,
+            encoding="utf-8"
+        ) as f:
+
+            return json.load(f)
+
+    except Exception as e:
+
+        st.warning(
+            f"Could not read regression comparison: {e}"
+        )
+
+        return None
+
+
+comparison = load_comparison()
 
 if st.button("🔄 Refresh Dashboard"):
     st.cache_data.clear()
@@ -154,6 +182,38 @@ def average_similarity(run):
         sum(similarities) / len(similarities),
         3
     )
+def average_deepeval_relevancy(run):
+
+    if not run:
+        return None
+
+    # Newer runs may store the average directly
+    direct_average = run.get(
+        "average_deepeval_relevancy"
+    )
+
+    if direct_average is not None:
+        return direct_average
+
+    results = run.get(
+        "results",
+        []
+    )
+
+    scores = [
+        item.get("deepeval_relevancy")
+        for item in results
+        if item.get("deepeval_relevancy") is not None
+        and item.get("status") != "error"
+    ]
+
+    if not scores:
+        return None
+
+    return round(
+        sum(scores) / len(scores),
+        3
+    )
 
 current_latency = average_latency(current)
 
@@ -170,6 +230,15 @@ previous_similarity = (
     else None
 )
 
+current_deepeval = average_deepeval_relevancy(
+    current
+)
+
+previous_deepeval = (
+    average_deepeval_relevancy(previous)
+    if previous
+    else None
+)
 
 
 # ==================================================
@@ -225,14 +294,32 @@ if (
         * 100,
         2
     )
+deepeval_delta = None
 
+if (
+    previous_deepeval is not None
+    and current_deepeval is not None
+    and previous_deepeval > 0
+):
+
+    deepeval_delta = round(
+        (
+            (
+                current_deepeval
+                - previous_deepeval
+            )
+            / previous_deepeval
+        )
+        * 100,
+        2
+    )
 # ==================================================
 # TOP METRICS
 # ==================================================
 
 st.divider()
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
 
@@ -286,7 +373,25 @@ with col4:
             else None
         ),
     )
+with col5:
 
+    st.metric(
+
+        "🤖 DeepEval Relevancy",
+
+        (
+            f"{current_deepeval:.3f}"
+            if current_deepeval is not None
+            else "N/A"
+        ),
+
+        (
+            f"{deepeval_delta}%"
+            if deepeval_delta is not None
+            else None
+        ),
+
+    )
 # ==================================================
 # PREVIOUS RUN INFORMATION
 # ==================================================
@@ -298,6 +403,7 @@ comparison_data = {
         "Accuracy",
         "Average Latency",
         "Average Semantic Similarity",
+        "Average DeepEval Relevancy",
     ],
     "Previous": [
     (
@@ -315,6 +421,11 @@ comparison_data = {
         if previous_similarity is not None
         else "N/A"
     ),
+    (
+        f"{previous_deepeval}"
+        if previous_deepeval is not None
+        else "N/A"
+    ),
 ],
     "Current": [
     f"{current_accuracy}%",
@@ -326,6 +437,11 @@ comparison_data = {
     (
         f"{current_similarity}"
         if current_similarity is not None
+        else "N/A"
+    ),
+    (
+        f"{current_deepeval}"
+        if current_deepeval is not None
         else "N/A"
     ),
 ],
@@ -343,6 +459,11 @@ comparison_data = {
     (
         f"{similarity_delta}%"
         if similarity_delta is not None
+        else "N/A"
+    ),
+    (
+        f"{deepeval_delta}%"
+        if deepeval_delta is not None
         else "N/A"
     ),
 ],
@@ -370,7 +491,11 @@ for index, run in enumerate(history):
     run_latency = average_latency(run)
 
     run_similarity = average_similarity(run)
+    run_deepeval = run.get(
+        "average_deepeval_relevancy"
+    )
 
+    
     prompt_version = run.get(
         "prompt_version",
         "Unknown"
@@ -392,6 +517,7 @@ for index, run in enumerate(history):
             ),
             "Average Latency": run_latency,
             "Average Similarity": run_similarity,
+            "Average DeepEval Relevancy": run_deepeval,
             "Prompt Version": str(
                 prompt_version
             ),
@@ -535,6 +661,63 @@ else:
         "No semantic similarity data available."
     )
 # ==================================================
+# DEEPEVAL RELEVANCY TREND
+# ==================================================
+
+st.subheader("🤖 DeepEval Relevancy Trend")
+
+deepeval_df = history_df.dropna(
+    subset=[
+        "Average DeepEval Relevancy"
+    ]
+)
+
+if not deepeval_df.empty:
+
+    deepeval_chart = px.line(
+
+        deepeval_df,
+
+        x="Run",
+
+        y="Average DeepEval Relevancy",
+
+        markers=True,
+
+        hover_data=[
+
+            "Filename",
+
+            "Prompt Version",
+
+            "Model",
+
+        ],
+
+    )
+
+    deepeval_chart.update_layout(
+
+        yaxis_title="Average DeepEval Relevancy",
+
+        xaxis_title="Evaluation Run",
+
+    )
+
+    st.plotly_chart(
+
+        deepeval_chart,
+
+        use_container_width=True,
+
+    )
+
+else:
+
+    st.info(
+        "No DeepEval relevancy data available."
+    )    
+# ==================================================
 # PROMPT VERSION COMPARISON
 # ==================================================
 
@@ -574,7 +757,16 @@ for prompt_version in sorted(
         ].mean(),
         3
     )
+    average_prompt_deepeval = round(
 
+    prompt_runs[
+
+        "Average DeepEval Relevancy"
+
+    ].mean(),
+
+    3
+)
     prompt_comparison_rows.append(
         {
             "Prompt Version": prompt_version,
@@ -582,6 +774,7 @@ for prompt_version in sorted(
             "Avg Accuracy": average_prompt_accuracy,
             "Avg Latency (s)": average_prompt_latency,
             "Avg Similarity": average_prompt_similarity,
+            "Avg DeepEval Relevancy": average_prompt_deepeval,
         }
     )
 
@@ -652,6 +845,28 @@ if not prompt_comparison_df.empty:
         prompt_similarity_chart,
         use_container_width=True,
     )
+    prompt_deepeval_chart = px.bar(
+        
+        prompt_comparison_df,
+        x="Prompt Version",
+        y="Avg DeepEval Relevancy",
+        text="Avg DeepEval Relevancy",
+    )
+    prompt_deepeval_chart.update_layout(
+
+    title="Average DeepEval Relevancy by Prompt Version",
+
+    yaxis_title="Average DeepEval Relevancy",
+
+    xaxis_title="Prompt Version",
+
+    )
+    st.plotly_chart(
+
+    prompt_deepeval_chart,
+
+    use_container_width=True,
+    )
 
 else:
 
@@ -690,6 +905,10 @@ model_comparison_df = (
                 "Average Similarity",
                 "mean"
             ),
+             "Avg DeepEval Relevancy": (
+                "Average DeepEval Relevancy",
+                "mean"
+            ),
         }
     )
     .reset_index()
@@ -716,7 +935,11 @@ model_comparison_df[
 ] = model_comparison_df[
     "Avg Similarity"
 ].round(3)
-
+model_comparison_df[
+    "Avg DeepEval Relevancy"
+] = model_comparison_df[
+    "Avg DeepEval Relevancy"
+].round(3)
 
 if not model_comparison_df.empty:
 
@@ -808,7 +1031,30 @@ if not model_comparison_df.empty:
         use_container_width=True,
     )
 
+    # ----------------------------------------------
+# MODEL DEEPEVAL RELEVANCY
+# ----------------------------------------------
 
+    st.subheader(
+    "🧪 DeepEval Relevancy by Model"
+)
+
+    model_deepeval_chart = px.bar(
+       model_comparison_df,
+       x="Model",
+       y="Avg DeepEval Relevancy",
+       text="Avg DeepEval Relevancy",
+)
+
+    model_deepeval_chart.update_layout(
+       yaxis_title="Average DeepEval Relevancy",
+       xaxis_title="Model",
+)
+
+    st.plotly_chart(
+      model_deepeval_chart,
+      use_container_width=True,
+)
     # ==================================================
     # AUTOMATIC MODEL WINNERS
     # ==================================================
@@ -869,10 +1115,24 @@ if not model_comparison_df.empty:
                 ]
             )
 
+        deepeval_models = model_comparison_df.dropna(
+          subset=["Avg DeepEval Relevancy"]
+)
 
-        winner_col1, winner_col2, winner_col3 = (
-            st.columns(3)
-        )
+        best_deepeval_model = None
+
+        if not deepeval_models.empty:
+
+           best_deepeval_model = (
+           deepeval_models.loc[
+            deepeval_models[
+                "Avg DeepEval Relevancy"
+            ].idxmax()
+        ]
+    )
+        winner_col1, winner_col2, winner_col3, winner_col4 = (
+          st.columns(4)
+)
 
 
         # Best Accuracy
@@ -933,7 +1193,26 @@ if not model_comparison_df.empty:
                     "🧠 Best Similarity",
                     "N/A",
                 )
+        with winner_col4:
 
+            if best_deepeval_model is not None:
+
+                st.metric(
+            "🧪 Best DeepEval",
+            best_deepeval_model[
+                "Model"
+            ],
+            (
+                f'{best_deepeval_model["Avg DeepEval Relevancy"]:.3f}'
+            ),
+        )
+
+            else:
+
+               st.metric(
+            "🧪 Best DeepEval",
+            "N/A",
+        )
 
     else:
 
@@ -1066,7 +1345,38 @@ if len(model_comparison_df) >= 2:
             "Similarity Score"
         ] = 1.0
 
+    # ----------------------------------------------
+# NORMALIZE DEEPEVAL RELEVANCY
+# Higher = better
+# ----------------------------------------------
 
+    deepeval_min = recommendation_df[
+    "Avg DeepEval Relevancy"
+].min()
+
+    deepeval_max = recommendation_df[
+    "Avg DeepEval Relevancy"
+].max()
+
+    if deepeval_max != deepeval_min:
+
+        recommendation_df[
+        "DeepEval Score"
+    ] = (
+        recommendation_df[
+            "Avg DeepEval Relevancy"
+        ]
+        - deepeval_min
+    ) / (
+        deepeval_max
+        - deepeval_min
+    )
+
+    else:
+
+        recommendation_df[
+        "DeepEval Score"
+    ] = 1.0
     # ----------------------------------------------
     # CALCULATE OVERALL SCORE
     #
@@ -1076,20 +1386,30 @@ if len(model_comparison_df) >= 2:
     # ----------------------------------------------
 
     recommendation_df[
-        "Overall Score"
-    ] = (
-        recommendation_df[
-            "Accuracy Score"
-        ] * 0.40
-        +
-        recommendation_df[
-            "Latency Score"
-        ] * 0.30
-        +
-        recommendation_df[
-            "Similarity Score"
-        ] * 0.30
-    )
+    "Overall Score"
+] = (
+    recommendation_df[
+        "Accuracy Score"
+    ] * 0.35
+
+    +
+
+    recommendation_df[
+        "Latency Score"
+    ] * 0.25
+
+    +
+
+    recommendation_df[
+        "Similarity Score"
+    ] * 0.20
+
+    +
+
+    recommendation_df[
+        "DeepEval Score"
+    ] * 0.20
+)
 
 
     # Convert to percentage
@@ -1163,6 +1483,7 @@ if len(model_comparison_df) >= 2:
             "Avg Accuracy",
             "Avg Latency (s)",
             "Avg Similarity",
+            "Avg DeepEval Relevancy",
             "Overall Score",
         ]
     ].sort_values(
@@ -1215,7 +1536,165 @@ else:
         "different models to get an overall "
         "model recommendation."
     )
-    
+# ==================================================
+# BASELINE COMPARISON
+# ==================================================
+
+st.divider()
+
+st.subheader("🔬 Baseline Comparison")
+
+if comparison:
+
+    baseline_name = comparison.get(
+        "baseline_name"
+    )
+
+    if baseline_name:
+
+        st.markdown(
+            f"**Baseline:** `{baseline_name}`"
+        )
+
+        baseline_col1, baseline_col2, baseline_col3, baseline_col4 = (
+         st.columns(4)
+)
+
+        with baseline_col1:
+
+            st.metric(
+                "🎯 Accuracy",
+                f'{comparison.get("current_accuracy", "N/A")}%',
+                f'{comparison.get("delta", "N/A")}%'
+            )
+
+            st.caption(
+                f'Baseline: '
+                f'{comparison.get("previous_accuracy", "N/A")}%'
+            )
+
+        with baseline_col2:
+
+            st.metric(
+                "⚡ Average Latency",
+                (
+                    f'{comparison.get("current_average_latency", "N/A")}s'
+                ),
+                (
+                    f'{comparison.get("latency_delta", "N/A")}%'
+                )
+            )
+
+            st.caption(
+                f'Baseline: '
+                f'{comparison.get("previous_average_latency", "N/A")}s'
+            )
+
+        with baseline_col3:
+
+            st.metric(
+                "🧠 Semantic Similarity",
+                comparison.get(
+                    "current_average_similarity",
+                    "N/A"
+                ),
+                (
+                    f'{comparison.get("similarity_delta", "N/A")}%'
+                )
+            )
+
+            st.caption(
+                f'Baseline: '
+                f'{comparison.get("previous_average_similarity", "N/A")}'
+            )
+        with baseline_col4:
+            st.metric(
+                "🤖 DeepEval Relevancy",
+                comparison.get(
+                    "current_average_deepeval_relevancy",
+                    "N/A"
+                ),
+                (
+                    f'{comparison.get("deepeval_delta", "N/A")}%'
+                )
+            )
+
+            st.caption(
+                f'Baseline: '
+                f'{comparison.get("previous_average_deepeval_relevancy", "N/A")}'
+            )
+        st.markdown("### Regression Status")
+
+        status_col1, status_col2, status_col3, status_col4 = (
+            st.columns(4)
+        )
+
+        with status_col1:
+
+            st.write(
+                f"**Accuracy:** "
+                f"{comparison.get('status', 'N/A')}"
+            )
+
+        with status_col2:
+
+            st.write(
+                f"**Latency:** "
+                f"{comparison.get('latency_status', 'N/A')}"
+            )
+
+        with status_col3:
+
+            st.write(
+                f"**Similarity:** "
+                f"{comparison.get('similarity_status', 'N/A')}"
+            )
+        with status_col4:
+            st.write(
+                f"**DeepEval Relevancy:** "
+                f"{comparison.get('current_average_deepeval_relevancy', 'N/A')}"
+                    )
+        regressions_count = len(
+            comparison.get(
+                "regressions",
+                []
+            )
+        )
+
+        improvements_count = len(
+            comparison.get(
+                "improvements",
+                []
+            )
+        )
+
+        count_col1, count_col2 = st.columns(2)
+
+        with count_col1:
+
+            st.metric(
+                "🔴 Regressions",
+                regressions_count
+            )
+
+        with count_col2:
+
+            st.metric(
+                "🟢 Improvements",
+                improvements_count
+            )
+
+    else:
+
+        st.info(
+            "No named baseline is currently being compared."
+        )
+
+else:
+
+    st.info(
+        "No regression comparison report found."
+    )    
 # ==================================================
 # CATEGORY PERFORMANCE
 # ==================================================

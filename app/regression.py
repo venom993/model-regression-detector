@@ -54,7 +54,23 @@ class RegressionDetector:
             sum(similarities) / len(similarities),
             3
         )
+    def calculate_average_deepeval_relevancy(self, results):
 
+        scores = [
+            item["deepeval_relevancy"]
+            for item in results
+            if item.get("deepeval_relevancy") is not None
+            and item.get("status") != "error"
+        ]
+
+        if not scores:
+            return 0
+
+        return round(
+            sum(scores) / len(scores),
+            3
+        )
+    
     def compare(
         self,
         current_results,
@@ -82,7 +98,11 @@ class RegressionDetector:
                 current_results
             )
         )
-
+        current_average_deepeval_relevancy = (
+            self.calculate_average_deepeval_relevancy(
+                current_results
+            )
+        )
         # ============================
         # FIRST RUN
         # ============================
@@ -108,7 +128,14 @@ class RegressionDetector:
                     current_average_similarity,
                 "similarity_delta": 0,
                 "similarity_status": "FIRST_RUN",
+                                "previous_average_deepeval_relevancy": None,
 
+                "current_average_deepeval_relevancy":
+                    current_average_deepeval_relevancy,
+
+                "deepeval_delta": 0,
+
+                "deepeval_status": "FIRST_RUN",
                 "regressions": [],
                 "improvements": [],
             }
@@ -173,7 +200,30 @@ class RegressionDetector:
 
         else:
             similarity_delta = 0
+        # ============================
+        # DEEPEVAL RELEVANCY
+        # ============================
 
+        previous_average_deepeval_relevancy = (
+            self.calculate_average_deepeval_relevancy(
+                previous["results"]
+            )
+        )
+
+        if previous_average_deepeval_relevancy > 0:
+
+            deepeval_delta = round(
+                (
+                    current_average_deepeval_relevancy
+                    - previous_average_deepeval_relevancy
+                )
+                / previous_average_deepeval_relevancy
+                * 100,
+                2
+            )
+
+        else:
+            deepeval_delta = 0
         # ============================
         # ACCURACY STATUS
         # ============================
@@ -212,7 +262,18 @@ class RegressionDetector:
 
         else:
             similarity_status = "PASS"
+                # ============================
+        # DEEPEVAL RELEVANCY STATUS
+        # ============================
 
+        if deepeval_delta <= -15:
+            deepeval_status = "CRITICAL"
+
+        elif deepeval_delta <= -7:
+            deepeval_status = "WARNING"
+
+        else:
+            deepeval_status = "PASS"
         # ============================
         # CASE REGRESSIONS
         # ============================
@@ -287,7 +348,17 @@ class RegressionDetector:
 
             "similarity_status":
                 similarity_status,
+                        "previous_average_deepeval_relevancy":
+                previous_average_deepeval_relevancy,
 
+            "current_average_deepeval_relevancy":
+                current_average_deepeval_relevancy,
+
+            "deepeval_delta":
+                deepeval_delta,
+
+            "deepeval_status":
+                deepeval_status,
             "regressions": regressions,
             "improvements": improvements,
         }
