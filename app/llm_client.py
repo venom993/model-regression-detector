@@ -11,8 +11,13 @@ class LLMClient:
     Wrapper around Ollama.
     """
 
-    def __init__(self):
-        self.client = Client(host=OLLAMA_HOST)
+    def __init__(self, model=None):
+
+        self.client = Client(
+            host=OLLAMA_HOST
+        )
+
+        self.model = model or OLLAMA_MODEL
 
     def generate(
         self,
@@ -22,7 +27,7 @@ class LLMClient:
     ) -> str:
 
         response = self.client.chat(
-            model=OLLAMA_MODEL,
+            model=self.model,
             messages=[
                 {
                     "role": "system",
@@ -35,7 +40,7 @@ class LLMClient:
             ],
             format="json",
             options={
-                "temperature": 1.0,
+                "temperature": temperature,
                 "num_predict": 128,
                 "seed": 42,
             },

@@ -9,14 +9,21 @@ from app.deepeval_evaluator import DeepEvalEvaluator
 
 class Evaluator:
 
-    def __init__(self):
+    def __init__(
+        self,
+        model=None,
+        prompt_version="2"
+    ):
 
         loader = PromptLoader()
 
-        self.prompt = loader.load("2")
+        self.prompt = loader.load(
+            prompt_version
+        )
 
         self.classifier = EmailClassifier(
-            self.prompt
+            self.prompt,
+            model=model
         )
 
         self.dataset_loader = DatasetLoader()
@@ -24,6 +31,8 @@ class Evaluator:
         self.semantic_similarity = SemanticSimilarity()
 
         self.deepeval = DeepEvalEvaluator()
+
+        self.model = model
 
     def run(self):
 
@@ -100,6 +109,9 @@ class Evaluator:
                     "latency":
                     latency,
 
+                    "model":
+                    self.model,
+
                     "status":
                     "passed"
                     if prediction.category ==
@@ -118,6 +130,9 @@ class Evaluator:
 
                     "error":
                     str(e),
+
+                    "model":
+                    self.model,
 
                     "status":
                     "error"

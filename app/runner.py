@@ -12,6 +12,7 @@ from app.report import HTMLReport
 from app.slack import SlackNotifier
 from app.metrics import calculate_accuracy, category_breakdown
 from app.trends import TrendAnalyzer
+from app.model_comparison import ModelComparison
 # --------------------------------------------------
 # COMMAND LINE ARGUMENTS
 # --------------------------------------------------
@@ -37,7 +38,11 @@ parser.add_argument(
     action="store_true",
     help="List all available baselines",
 )
-
+parser.add_argument(
+    "--compare-models",
+    action="store_true",
+    help="Compare two Ollama models",
+)
 args = parser.parse_args()
 # --------------------------------------------------
 # LIST BASELINES
@@ -59,6 +64,21 @@ if args.list_baselines:
             print(f" - {baseline}")
 
     sys.exit(0)
+# --------------------------------------------------
+# MODEL-TO-MODEL COMPARISON
+# --------------------------------------------------
+
+if args.compare_models:
+
+    comparison = ModelComparison(
+        model_a="llama3.1:8b",
+        model_b="llama3.2:3b",
+        prompt_version="1",
+    )
+
+    comparison.compare()
+
+    sys.exit(0)    
 evaluator = Evaluator()
 
 results = evaluator.run()

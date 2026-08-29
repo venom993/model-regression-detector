@@ -14,9 +14,13 @@ class ClassificationResult(BaseModel):
 
 class EmailClassifier:
 
-    def __init__(self, prompt: PromptConfig):
+    def __init__(
+    self,
+    prompt: PromptConfig,
+    model=None,
+):
         self.prompt = prompt
-        self.llm = LLMClient()
+        self.llm = LLMClient(model=model)
 
     def _parse_json(self, response: str):
         """
@@ -27,7 +31,7 @@ class EmailClassifier:
         response = response.replace("```json", "").replace("```", "").strip()
 
         # Extract JSON object
-        match = re.search(r"\{.*", response, re.DOTALL)
+        match = re.search(r"\{.*\}", response, re.DOTALL)
 
         if not match:
             raise ValueError(f"No JSON found:\n{response}")

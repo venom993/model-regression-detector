@@ -12,7 +12,11 @@ OLLAMA_HOST = os.getenv(
 
 OLLAMA_MODEL = os.getenv(
     "OLLAMA_MODEL",
-    "llama3.2"
+    "llama3.2:3b"
+)
+OLLAMA_COMPARE_MODEL = os.getenv(
+    "OLLAMA_COMPARE_MODEL",
+    "llama3.1:8b"
 )
 
 DATABASE_PATH = os.getenv(
