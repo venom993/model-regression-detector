@@ -1,11 +1,13 @@
-# Testing GitHub Pull Request regression comments
 import argparse
 import json
 import sys
 from pathlib import Path
 
 from app.history import HistoryManager
-from app.config import OLLAMA_MODEL
+from app.config import (
+    OLLAMA_MODEL,
+    OLLAMA_COMPARE_MODEL,
+)
 from app.regression import RegressionDetector
 from app.evaluator import Evaluator
 from app.report import HTMLReport
@@ -71,15 +73,19 @@ if args.list_baselines:
 if args.compare_models:
 
     comparison = ModelComparison(
-        model_a="llama3.1:8b",
-        model_b="llama3.2:3b",
-        prompt_version="1",
+        model_a=OLLAMA_COMPARE_MODEL,
+        model_b=OLLAMA_MODEL,
+        prompt_version="2",
     )
 
     comparison.compare()
 
-    sys.exit(0)    
-evaluator = Evaluator()
+    sys.exit(0)
+
+evaluator = Evaluator(
+    model=OLLAMA_MODEL,
+    prompt_version="2",
+)
 
 results = evaluator.run()
 
@@ -375,7 +381,7 @@ if args.save_baseline:
     baseline_file = history.save_baseline(
         name=args.save_baseline,
         prompt_version=evaluator.prompt.version,
-        model=OLLAMA_MODEL,
+        model=evaluator.model,
         accuracy=accuracy,
         category_breakdown=breakdown,
         results=results,
@@ -394,7 +400,7 @@ history = HistoryManager()
 
 history_file = history.save_run(
     prompt_version=evaluator.prompt.version,
-    model=OLLAMA_MODEL,
+    model=evaluator.model,
     accuracy=accuracy,
     category_breakdown=breakdown,
     results=results,
@@ -441,7 +447,7 @@ report_path = report.generate(
     comparison=comparison,
     breakdown=breakdown,
     prompt_version=evaluator.prompt.version,
-    model=OLLAMA_MODEL,
+    model=evaluator.model,
     history=history_data,
 )
 
@@ -476,7 +482,7 @@ notifier = SlackNotifier()
 notifier.send(
     comparison=comparison,
     prompt_version=evaluator.prompt.version,
-    model=OLLAMA_MODEL,
+    model=evaluator.model,
 )
 
 
@@ -494,4 +500,3 @@ if (
     sys.exit(1)
 
 print("\nCI regression test run")
-# Test automatic GitHub PR regression comment

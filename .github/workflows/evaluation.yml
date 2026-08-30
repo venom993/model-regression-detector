@@ -47,7 +47,43 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+            # ==============================================
+      # CHECK OLLAMA
+      # ==============================================
+      - name: Check Ollama
+        shell: powershell
+        env:
+          OLLAMA_HOST: ${{ secrets.OLLAMA_HOST }}
+          OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
+        run: |
+          Write-Host "Ollama host: $env:OLLAMA_HOST"
+          Write-Host "Ollama model: $env:OLLAMA_MODEL"
 
+          ollama --version
+
+          $response = Invoke-WebRequest `
+            -Uri "$env:OLLAMA_HOST/api/tags" `
+            -UseBasicParsing
+
+          if ($response.StatusCode -ne 200) {
+            Write-Host "Ollama API is not healthy."
+            exit 1
+          }
+
+          Write-Host "Ollama API is healthy."
+
+          $models = $response.Content | ConvertFrom-Json
+
+          $modelFound = $models.models |
+            Where-Object { $_.name -eq $env:OLLAMA_MODEL }
+
+          if (-not $modelFound) {
+            Write-Host "Required Ollama model not found:"
+            Write-Host $env:OLLAMA_MODEL
+            exit 1
+          }
+
+          Write-Host "Required Ollama model is available."
       # ==============================================
       # RUN EVALUATION
       # ==============================================
@@ -257,7 +293,18 @@ jobs:
         run: |
           Write-Host "Critical regression detected."
           exit 1
-
+            # ==============================================
+      # UPLOAD EVALUATION REPORTS
+      # ==============================================
+      - name: Upload evaluation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-regression-reports
+          path: |
+            reports/
+            history/
+          if-no-files-found: warn
       # ==============================================
       # COMMIT EVALUATION HISTORY
       # ==============================================
