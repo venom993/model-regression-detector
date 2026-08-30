@@ -47,7 +47,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-            # ==============================================
+      # ==============================================
       # CHECK OLLAMA
       # ==============================================
       - name: Check Ollama
@@ -84,6 +84,19 @@ jobs:
           }
 
           Write-Host "Required Ollama model is available."
+          Write-Host "Testing model inference..."
+
+          $testResponse = ollama run $env:OLLAMA_MODEL "Reply with OK"
+
+          Write-Host "Model response:"
+          Write-Host $testResponse
+
+          if ($testResponse -notmatch "OK") {
+            Write-Host "Ollama model inference test failed."
+            exit 1
+          }
+
+          Write-Host "Ollama model inference test passed."
       # ==============================================
       # RUN EVALUATION
       # ==============================================
@@ -293,7 +306,7 @@ jobs:
         run: |
           Write-Host "Critical regression detected."
           exit 1
-            # ==============================================
+      # ==============================================
       # UPLOAD EVALUATION REPORTS
       # ==============================================
       - name: Upload evaluation reports
