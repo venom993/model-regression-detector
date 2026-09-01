@@ -1,3 +1,4 @@
+
 import json
 import re
 
@@ -15,10 +16,10 @@ class ClassificationResult(BaseModel):
 class EmailClassifier:
 
     def __init__(
-    self,
-    prompt: PromptConfig,
-    model=None,
-):
+        self,
+        prompt: PromptConfig,
+        model=None,
+    ):
         self.prompt = prompt
         self.llm = LLMClient(model=model)
 
@@ -28,7 +29,12 @@ class EmailClassifier:
         """
 
         # Remove markdown code fences if present
-        response = response.replace("```json", "").replace("```", "").strip()
+        response = (
+            response
+            .replace("```json", "")
+            .replace("```", "")
+            .strip()
+        )
 
         # Extract JSON object
         match = re.search(r"\{.*\}", response, re.DOTALL)
@@ -50,6 +56,7 @@ class EmailClassifier:
 Classify this customer email.
 
 Email:
+
 {email}
 
 Return ONLY valid JSON.
@@ -57,11 +64,12 @@ Return ONLY valid JSON.
 Example:
 
 {{
-  "category":"billing",
-  "summary":"Customer requests a refund."
+    "category":"billing",
+    "summary":"Customer requests a refund."
 }}
 
 Do not include explanations.
+
 Do not include markdown.
 """
 
@@ -76,6 +84,7 @@ Do not include markdown.
 
             try:
                 data = self._parse_json(response)
+
                 return ClassificationResult(**data)
 
             except Exception:
@@ -86,3 +95,4 @@ Do not include markdown.
                     )
 
         raise RuntimeError("Unexpected classifier failure.")
+

@@ -12,12 +12,12 @@ The system currently uses **Ollama** to run local LLMs, with `llama3.2:3b` as th
 
 LLM applications can silently become worse when:
 
-* the underlying model changes
-* the prompt changes
-* the model configuration changes
-* the application code https://github.com/venom993/model-regression-detectorchanges
-* a new model version is introduced
-* multilingual or noisy inputs are introduced
+- the underlying model changes
+- the prompt changes
+- the model configuration changes
+- the application code changes
+- a new model version is introduced
+- multilingual or noisy inputs are introduced
 
 Traditional unit tests are not enough for these situations because LLMs produce probabilistic outputs.
 
@@ -25,7 +25,7 @@ This project solves that problem by maintaining a **golden evaluation dataset** 
 
 The pipeline:
 
-
+```text
                     ┌─────────────────────┐
                     │   Golden Dataset    │
                     │  100 Test Cases     │
@@ -67,6 +67,7 @@ The pipeline:
           HTML              Slack             CI/CD
           Report            Alert             Pass/Fail
 
+```
 
 ---
 
@@ -78,26 +79,27 @@ The project contains a 100-case golden dataset:
 
 ```text
 datasets/golden_dataset_v1.json
+
 ```
 
 The dataset includes:
 
-* billing cases
-* technical cases
-* account cases
-* general inquiries
-* ambiguous inputs
-* empty input
-* noisy input
-* misspelled input
-* slang
-* multilingual messages
-* mixed-language messages
-* difficult classification cases
+- billing cases
+- technical cases
+- account cases
+- general inquiries
+- ambiguous inputs
+- empty input
+- noisy input
+- misspelled input
+- slang
+- multilingual messages
+- mixed-language messages
+- difficult classification cases
 
 Example:
 
-
+```json
 {
   "id": "email_001",
   "input": "I was charged twice for my subscription this month.",
@@ -109,6 +111,7 @@ Example:
   "notes": "Basic duplicate charge detection"
 }
 
+```
 
 ---
 
@@ -118,20 +121,22 @@ The application uses Ollama to run a local LLM.
 
 Default configuration:
 
-
+```text
 Provider: Ollama
 Model: llama3.2:3b
 Host: http://localhost:11434
 
+```
 
 The classifier expects the model to return structured JSON:
 
-
+```json
 {
   "category": "billing",
   "summary": "Customer requests a refund."
 }
 
+```
 
 The classifier also contains JSON extraction and retry handling for malformed LLM responses.
 
@@ -147,12 +152,13 @@ Measures whether the predicted category matches the expected category.
 
 Example:
 
-
+```text
 Expected: billing
 Predicted: billing
 
 Result: PASS
 
+```
 
 ---
 
@@ -162,9 +168,10 @@ Measures how long the LLM takes to produce a response.
 
 Example:
 
-
+```text
 Average latency: 2.431 seconds
 
+```
 
 Latency is tracked over time and can participate in regression detection.
 
@@ -184,15 +191,17 @@ DeepEval is used to evaluate how relevant the generated response is to the origi
 
 The project uses:
 
-
+```python
 AnswerRelevancyMetric
 
+```
 
 with:
 
-
+```text
 threshold = 0.5
 
+```
 
 The DeepEval evaluator uses the same Ollama model configuration.
 
@@ -204,28 +213,30 @@ The project compares the current evaluation with a previous run or a named basel
 
 Example:
 
-
+```text
 Previous Accuracy : 94.0%
 Current Accuracy  : 89.0%
 
 Delta             : -5.0%
 Status            : CRITICAL
 
+```
 
 The pipeline can detect regressions in:
 
-* accuracy
-* latency
-* semantic similarity
-* DeepEval relevancy
+- accuracy
+- latency
+- semantic similarity
+- DeepEval relevancy
 
 Each test case can also be classified as:
 
-
+```text
 Regression
 Improvement
 Unchanged
 
+```
 
 ---
 
@@ -235,21 +246,24 @@ Named baselines can be created.
 
 For example:
 
-powershell
+```powershell
 python -m app.runner --save-baseline production-v1
 
+```
 
 Later, the current model can be compared against that baseline:
 
-powershell
+```powershell
 python -m app.runner --baseline production-v1
 
+```
 
 Available baselines can be listed with:
 
-powershell
+```powershell
 python -m app.runner --list-baselines
 
+```
 
 This makes it possible to compare a new prompt or model against a known-good version rather than only against the immediately previous run.
 
@@ -261,27 +275,28 @@ The project supports comparing two Ollama models.
 
 Run:
 
-powershell
+```powershell
 python -m app.runner --compare-models
 
+```
 
 The comparison evaluates:
 
-* accuracy
-* average latency
-* semantic similarity
-* DeepEval relevancy
+- accuracy
+- average latency
+- semantic similarity
+- DeepEval relevancy
 
 A weighted score is calculated.
 
 Current weights:
 
-| Metric              | Weight |
-| ------------------- | -----: |
-| Accuracy            |    50% |
-| Semantic Similarity |    20% |
-| DeepEval Relevancy  |    20% |
-| Latency             |    10% |
+| MetricWeight        |     |
+| ------------------- | --- |
+| Accuracy            | 50% |
+| Semantic Similarity | 20% |
+| DeepEval Relevancy  | 20% |
+| Latency             | 10% |
 
 Accuracy has the highest weight because this application is primarily an email classification system.
 
@@ -289,7 +304,7 @@ The result identifies the overall winner.
 
 Example:
 
-text
+```text
 Weighted Score:
 
 llama3.2:3b: 0.8421
@@ -297,12 +312,14 @@ other-model: 0.8174
 
 Winner: llama3.2:3b
 
+```
 
 The comparison is saved to:
 
-
+```text
 reports/model_comparison.json
 
+```
 
 ---
 
@@ -312,17 +329,19 @@ Every evaluation run can be stored in the history system.
 
 The database is configured as:
 
-
+```text
 history/evals.db
 
+```
 
 Historical runs can be used to determine whether model quality is improving or degrading.
 
 The project also stores run information under:
 
-
+```text
 history/
 
+```
 
 ---
 
@@ -330,32 +349,34 @@ history/
 
 After an evaluation, the application generates an HTML report:
 
-
+```text
 reports/evaluation_report.html
 
+```
 
 The report contains:
 
-* evaluation date
-* prompt version
-* model
-* comparison target
-* accuracy
-* latency
-* semantic similarity
-* DeepEval relevancy
-* category accuracy
-* regressions
-* improvements
-* historical charts
+- evaluation date
+- prompt version
+- model
+- comparison target
+- accuracy
+- latency
+- semantic similarity
+- DeepEval relevancy
+- category accuracy
+- regressions
+- improvements
+- historical charts
 
 Open the report directly in your browser.
 
 On Windows:
 
-powershell
+```powershell
 start reports\evaluation_report.html
 
+```
 
 ---
 
@@ -367,33 +388,38 @@ The project generates charts for:
 
 ### Accuracy
 
-
+```text
 reports/accuracy.png
 
+```
 
 and:
 
-
+```text
 reports/accuracy_trend.png
 
+```
 
 ### Latency
 
-
+```text
 reports/latency.png
 
+```
 
 and:
 
-
+```text
 reports/latency_trend.png
 
+```
 
 ### DeepEval Relevancy
 
-text
+```text
 reports/deepeval_relevancy.png
 
+```
 
 These charts make it easier to see long-term model performance changes.
 
@@ -405,22 +431,23 @@ The project supports Slack notifications through a webhook.
 
 Notifications can contain:
 
-* model
-* prompt version
-* previous accuracy
-* current accuracy
-* accuracy delta
-* latency
-* similarity
-* DeepEval relevancy
-* regression count
-* improvement count
+- model
+- prompt version
+- previous accuracy
+- current accuracy
+- accuracy delta
+- latency
+- similarity
+- DeepEval relevancy
+- regression count
+- improvement count
 
 Configure the webhook in `.env`:
 
-env
+```env
 SLACK_WEBHOOK_URL=https://hooks.slack.com/...
 
+```
 
 If the webhook is not configured, the application continues without sending a notification.
 
@@ -430,7 +457,7 @@ If the webhook is not configured, the application continues without sending a no
 
 The main project structure is:
 
-
+```text
 model-regression-detector/
 │
 ├── app/
@@ -473,6 +500,7 @@ model-regression-detector/
 ├── requirements.txt
 └── README.md
 
+```
 
 ---
 
@@ -480,11 +508,11 @@ model-regression-detector/
 
 Before running the project locally, install:
 
-* Windows 10/11
-* Python 3.11+
-* Git
-* Ollama
-* Docker Desktop — optional for local Docker execution
+- Windows 10/11
+- Python 3.11+
+- Git
+- Ollama
+- Docker Desktop — optional for local Docker execution
 
 The project has been developed and tested around a Windows development environment.
 
@@ -494,39 +522,45 @@ The project has been developed and tested around a Windows development environme
 
 Clone the repository:
 
-powershell
+```powershell
 git clone <YOUR-GITHUB-REPOSITORY-URL>
 
+```
 
 Enter the project:
 
-powershell
+```powershell
 cd model-regression-detector
 
+```
 
 Create a virtual environment:
 
-powershell
+```powershell
 python -m venv .venv
 
+```
 
 Activate it:
 
-powershell
+```powershell
 .venv\Scripts\Activate.ps1
 
+```
 
 If PowerShell blocks script execution, you can activate the environment using:
 
-powershell
+```powershell
 .venv\Scripts\activate
 
+```
 
 or run Python directly from the environment:
 
-powershell
+```powershell
 .venv\Scripts\python.exe --version
 
+```
 
 ---
 
@@ -534,13 +568,14 @@ powershell
 
 Install the required packages:
 
-powershell
+```powershell
 pip install -r requirements.txt
 
+```
 
 The project uses packages including:
 
-
+```text
 ollama
 deepeval
 pydantic
@@ -560,6 +595,7 @@ tqdm
 pytest
 pytest-asyncio
 
+```
 
 ---
 
@@ -569,47 +605,54 @@ Install Ollama and make sure the Ollama service is running.
 
 Check:
 
-powershell
+```powershell
 ollama --version
 
+```
 
 Check installed models:
 
-powershell
+```powershell
 ollama list
 
+```
 
 The default model is:
 
-
+```text
 llama3.2:3b
 
+```
 
 If it is not installed:
 
-powershell
+```powershell
 ollama pull llama3.2:3b
 
+```
 
 Test it:
 
-powershell
+```powershell
 ollama run llama3.2:3b
 
+```
 
 Then exit the model session.
 
 Verify that the API is available:
 
-powershell
+```powershell
 curl http://localhost:11434/api/tags
 
+```
 
 The application expects Ollama to be available at:
 
-text
+```text
 http://localhost:11434
 
+```
 
 ---
 
@@ -619,7 +662,7 @@ Create a `.env` file in the project root.
 
 Example:
 
-
+```env
 LLM_PROVIDER=ollama
 
 OLLAMA_HOST=http://localhost:11434
@@ -630,6 +673,7 @@ DATABASE_PATH=history/evals.db
 
 SLACK_WEBHOOK_URL=
 
+```
 
 ### Important
 
@@ -645,9 +689,10 @@ Use `.env.example` for the safe configuration template.
 
 With the virtual environment activated and Ollama running:
 
-powershell
+```powershell
 python -m app.runner
 
+```
 
 The pipeline will:
 
@@ -673,7 +718,7 @@ The pipeline will:
 
 A successful evaluation may look similar to:
 
-
+```text
 Total results: 100
 
 ===================
@@ -724,6 +769,7 @@ Status                 : PASS
 Regressions: 2
 Improvements: 1
 
+```
 
 ---
 
@@ -733,19 +779,21 @@ The runner is designed to work with CI/CD systems.
 
 The process exits with:
 
-text
+```text
 0 = successful evaluation
 1 = critical regression detected
 
+```
 
 A critical regression occurs when one of the monitored metrics has a `CRITICAL` status:
 
-
+```text
 Accuracy
 Latency
 Semantic Similarity
 DeepEval Relevancy
 
+```
 
 This is important because GitHub Actions can use the process exit code to automatically mark the workflow as failed.
 
@@ -757,22 +805,26 @@ The project also supports Docker execution.
 
 Build the image:
 
-powershell
+```powershell
 docker compose build
 
+```
 
 Start the service:
 
-powershell
+```powershell
 docker compose up
 
+```
 
 The Docker configuration uses:
 
+```text
 LLM_PROVIDER=ollama
 OLLAMA_HOST=http://host.docker.internal:11434
 OLLAMA_MODEL=llama3.2:3b
 
+```
 
 The `host.docker.internal` address allows the container to communicate with Ollama running on the Windows host.
 
@@ -782,7 +834,7 @@ The `host.docker.internal` address allows the container to communicate with Olla
 
 When running the application in Docker on Windows:
 
-
+```text
 ┌───────────────────────────────┐
 │          Windows Host         │
 │                               │
@@ -802,6 +854,7 @@ When running the application in Docker on Windows:
 │                               │
 └───────────────────────────────┘
 
+```
 
 ---
 
@@ -809,33 +862,38 @@ When running the application in Docker on Windows:
 
 DeepEval is integrated through:
 
-
+```text
 app/deepeval_evaluator.py
 
+```
 
 The evaluator uses:
 
-python
+```python
 OllamaModel
 
+```
 
 and:
 
-python
+```python
 AnswerRelevancyMetric
 
+```
 
 The configured threshold is:
 
-
+```text
 0.5
 
+```
 
 DeepEval results are stored with the individual evaluation results and aggregated into:
 
-
+```text
 average_deepeval_relevancy
 
+```
 
 This value is also used by regression detection and model comparison.
 
@@ -845,38 +903,43 @@ This value is also used by regression detection and model comparison.
 
 To compare the configured models:
 
-powershell
+```powershell
 python -m app.runner --compare-models
 
+```
 
 The project uses:
 
-
+```text
 OLLAMA_MODEL
 
+```
 
 and:
 
-
+```text
 OLLAMA_COMPARE_MODEL
 
+```
 
 for the two models.
 
 The comparison produces:
 
-
+```text
 reports/model_comparison.json
 
+```
 
 You can use this to determine which model provides the best balance between:
 
-
+```text
 Accuracy
 Similarity
 DeepEval Relevancy
 Latency
 
+```
 
 ---
 
@@ -886,9 +949,10 @@ Latency
 
 Create a named baseline:
 
-powershell
+```powershell
 python -m app.runner --save-baseline production-v1
 
+```
 
 This allows you to preserve a known-good model evaluation.
 
@@ -896,27 +960,30 @@ This allows you to preserve a known-good model evaluation.
 
 ## List baselines
 
-powershell
+```powershell
 python -m app.runner --list-baselines
 
+```
 
 Example:
 
-
+```text
 Available baselines:
 
  - production-v1
  - production-v2
  - pre-release
 
+```
 
 ---
 
 ## Compare against a baseline
 
-powershell
+```powershell
 python -m app.runner --baseline production-v1
 
+```
 
 This is useful before deploying a new model or changing a prompt.
 
@@ -926,7 +993,7 @@ This is useful before deploying a new model or changing a prompt.
 
 A recommended workflow is:
 
-
+```text
 1. Modify prompt/model
           ↓
 2. Run evaluation
@@ -947,6 +1014,7 @@ A recommended workflow is:
           ↓
 10. CI passes or fails
 
+```
 
 ---
 
@@ -954,45 +1022,52 @@ A recommended workflow is:
 
 Check the current branch:
 
-powershell
+```powershell
 git branch --show-current
 
+```
 
 Switch to `main`:
 
-powershell
+```powershell
 git switch main
 
+```
 
 Update it:
 
-powershell
+```powershell
 git pull origin main
 
+```
 
 Check status:
 
-powershell
+```powershell
 git status
 
+```
 
 Add changes:
 
-powershell
+```powershell
 git add .
 
+```
 
 Commit:
 
-powershell
+```powershell
 git commit -m "Add LLM regression detection pipeline"
 
+```
 
 Push:
 
-powershell
+```powershell
 git push origin main
 
+```
 
 ---
 
@@ -1002,7 +1077,7 @@ The intended CI workflow runs the regression detector automatically when code is
 
 The workflow should:
 
-
+```text
 Git Push
    │
    ▼
@@ -1024,18 +1099,21 @@ Evaluate model
    │
    └── CRITICAL ──► Workflow fails
 
+```
 
 Because `app/runner.py` returns:
 
-
+```text
 exit code 0
 
+```
 
 for success and:
 
-
+```text
 exit code 1
 
+```
 
 for critical regressions, GitHub Actions can directly use the result to determine whether the workflow succeeds.
 
@@ -1045,7 +1123,7 @@ for critical regressions, GitHub Actions can directly use the result to determin
 
 After running the pipeline, you may see:
 
-
+```text
 reports/
 │
 ├── evaluation_report.html
@@ -1058,15 +1136,17 @@ reports/
 ├── accuracy_trend.png
 └── latency_trend.png
 
+```
 
 Historical data:
 
-
+```text
 history/
 │
 ├── evals.db
 └── run_*.json
 
+```
 
 ---
 
@@ -1076,18 +1156,19 @@ history/
 
 Responsible for:
 
-* sending classification prompts
-* communicating with the LLM client
-* parsing JSON
-* repairing common JSON formatting problems
-* retrying invalid responses
-* validating output with Pydantic
+- sending classification prompts
+- communicating with the LLM client
+- parsing JSON
+- repairing common JSON formatting problems
+- retrying invalid responses
+- validating output with Pydantic
 
 Main class:
 
-python
+```python
 EmailClassifier
 
+```
 
 ---
 
@@ -1103,9 +1184,10 @@ Responsible for DeepEval-based relevancy evaluation.
 
 Main class:
 
-python
+```python
 DeepEvalEvaluator
 
+```
 
 ---
 
@@ -1131,12 +1213,13 @@ Responsible for evaluating two models and calculating weighted model scores.
 
 Responsible for generating:
 
-
+```text
 HTML reports
 Accuracy charts
 Latency charts
 DeepEval charts
 
+```
 
 ---
 
@@ -1158,7 +1241,7 @@ The main orchestration layer.
 
 It connects:
 
-
+```text
 Evaluator
        ↓
 Metrics
@@ -1177,6 +1260,7 @@ Slack
        ↓
 CI Exit Code
 
+```
 
 ---
 
@@ -1184,10 +1268,11 @@ CI Exit Code
 
 Without regression testing, a prompt change can look harmless:
 
-
+```text
 Old Prompt → 95% accuracy
 New Prompt → 88% accuracy
 
+```
 
 The application may still technically run without errors.
 
@@ -1197,23 +1282,25 @@ This project instead treats model behavior as something that needs continuous te
 
 For example:
 
-
+```text
 Prompt Version 1
 Accuracy: 95%
 Similarity: 0.91
 DeepEval: 0.89
 Latency: 2.1s
 
+```
 
 After a prompt modification:
 
-
+```text
 Prompt Version 2
 Accuracy: 86%
 Similarity: 0.79
 DeepEval: 0.76
 Latency: 2.5s
 
+```
 
 The regression detector can identify the degradation and stop the CI pipeline.
 
@@ -1227,7 +1314,7 @@ The current golden dataset contains 100 cases covering:
 
 Examples include:
 
-
+```text
 Duplicate charges
 Refund requests
 Payment failures
@@ -1235,12 +1322,13 @@ Recurring charges
 Unknown charges
 Premium feature access
 
+```
 
 ### Technical
 
 Examples include:
 
-
+```text
 Application crashes
 Slow websites
 File upload problems
@@ -1248,12 +1336,13 @@ Notifications
 Update problems
 Service outages
 
+```
 
 ### Account
 
 Examples include:
 
-
+```text
 Forgotten passwords
 Login failures
 Account lockouts
@@ -1261,24 +1350,26 @@ Email changes
 Account deletion
 Unauthorized access
 
+```
 
 ### General
 
 Examples include:
 
-
+```text
 Product questions
 Pricing questions
 Support contact
 Discount questions
 General feedback
 
+```
 
 ### Difficult Cases
 
 The dataset also includes:
 
-
+```text
 Empty messages
 Random text
 Typos
@@ -1290,6 +1381,9 @@ Spanish
 French
 German
 Arabic
+Amharic
+
+```
 
 ---
 
@@ -1297,16 +1391,18 @@ Arabic
 
 The project is prepared for automated testing with:
 
-
+```text
 pytest
 pytest-asyncio
 
+```
 
 Run:
 
-powershell
+```powershell
 pytest
 
+```
 
 Currently, the project does not contain a complete automated unit-test suite, so this is an area for future development.
 
@@ -1316,24 +1412,24 @@ Currently, the project does not contain a complete automated unit-test suite, so
 
 Potential future improvements include:
 
-* GitHub Actions CI
-* automatic PR regression comments
-* automatic HTML report artifacts
-* test result artifacts
-* more unit tests
-* more golden dataset cases
-* RAGAS integration
-* multiple model providers
-* OpenAI evaluation support
-* Anthropic evaluation support
-* configurable regression thresholds
-* dashboard improvements
-* Streamlit monitoring dashboard
-* scheduled nightly evaluations
-* automatic baseline management
-* prompt A/B testing
-* model performance history
-* production monitoring
+- GitHub Actions CI
+- automatic PR regression comments
+- automatic HTML report artifacts
+- test result artifacts
+- more unit tests
+- more golden dataset cases
+- RAGAS integration
+- multiple model providers
+- OpenAI evaluation support
+- Anthropic evaluation support
+- configurable regression thresholds
+- dashboard improvements
+- Streamlit monitoring dashboard
+- scheduled nightly evaluations
+- automatic baseline management
+- prompt A/B testing
+- model performance history
+- production monitoring
 
 ---
 
@@ -1341,21 +1437,23 @@ Potential future improvements include:
 
 Never commit secrets such as:
 
-
+```text
 .env
 Slack webhooks
 API keys
 tokens
 credentials
 
+```
 
 Use environment variables or GitHub Actions Secrets instead.
 
 The repository should contain:
 
-
+```text
 .env.example
 
+```
 
 rather than your real `.env`.
 
@@ -1367,9 +1465,10 @@ Add your preferred license here.
 
 For example:
 
-
+```text
 MIT License
 
+```
 
 ---
 
@@ -1377,7 +1476,7 @@ MIT License
 
 Developed as an LLM evaluation and CI/CD project demonstrating:
 
-
+```text
 Python
 Ollama
 DeepEval
@@ -1391,6 +1490,7 @@ Matplotlib
 SQLite
 CI/CD
 
+```
 
 ---
 
@@ -1398,7 +1498,7 @@ CI/CD
 
 For someone who has just cloned the repository:
 
-powershell
+```powershell
 git clone <YOUR-GITHUB-REPOSITORY-URL>
 
 cd model-regression-detector
@@ -1413,18 +1513,21 @@ ollama pull llama3.2:3b
 
 python -m app.runner
 
+```
 
 Then open:
 
-text
+```text
 reports/evaluation_report.html
 
+```
 
 On Windows:
 
-\powershell
+```powershell
 start reports\evaluation_report.html
 
+```
 
 ---
 
@@ -1432,7 +1535,7 @@ start reports\evaluation_report.html
 
 Current capabilities:
 
-`
+```text
 ✅ Golden dataset
 ✅ 100 evaluation cases
 ✅ Ollama integration
@@ -1454,7 +1557,9 @@ Current capabilities:
 ✅ Slack notifications
 ✅ CI failure exit codes
 ✅ Docker support
+🚧 GitHub Actions CI
+🚧 Automated unit-test suite
 
+```
 
-
-The next major CI/CD step is to connect the existing `app/runner.py` exit-code behavior to a GitHub Actions workflow so that every push can automatically execute the Docker regression test and prevent a merge/deployment when a critical model or prompt regression is detected.
+The next major CI/CD step is to connect the existing `app/runner.py` exit-code behavior to a GitHub Actions workflow so that every push can automatically execute the Docker regression test and prevent a merge/deployment when a critical model or prompt regression is detected. 
