@@ -500,3 +500,4 @@ if (
     sys.exit(1)
 
 print("\nCI regression test run")
+sys.exit(0)
