@@ -15,7 +15,7 @@ LLM applications can silently become worse when:
 * the underlying model changes
 * the prompt changes
 * the model configuration changes
-* the application code changes
+* the application code https://github.com/venom993/model-regression-detectorchanges
 * a new model version is introduced
 * multilingual or noisy inputs are introduced
 
